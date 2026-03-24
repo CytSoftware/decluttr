@@ -140,7 +140,7 @@ export function App() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       {state.deckState === "loading" && (
-        <LoadingScreen captureProgress={captureProgress ?? undefined} />
+        <LoadingScreen />
       )}
 
       {state.deckState === "swiping" && (

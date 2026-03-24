@@ -12,6 +12,7 @@ export default defineConfig({
       manifest: "manifest.json",
       browser,
       additionalInputs: ["src/newtab/index.html"],
+      disableAutoLaunch: true,
     }),
   ],
   build: {

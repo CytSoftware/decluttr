@@ -6,10 +6,18 @@ export interface TabCard {
   favIconUrl?: string;
   lastAccessed: number;
   pinned: boolean;
-  screenshotUrl?: string;
   isDuplicate: boolean;
   duplicateGroupId?: string;
+  duplicateCount?: number;
   domain: string;
+  fullPath: string;
+  tabIndex: number;
+  windowIndex: number;
+  totalWindows: number;
+  status?: string;
+  isAudible: boolean;
+  isMuted: boolean;
+  isDiscarded: boolean;
 }
 
 export interface DuplicateGroup {

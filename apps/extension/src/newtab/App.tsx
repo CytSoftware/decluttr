@@ -3,7 +3,6 @@ import browser from "webextension-polyfill";
 import type { TabCard } from "@decluttr/types";
 import { useSwipeDeck } from "./hooks/useSwipeDeck";
 import { fetchAndProcessTabs } from "../lib/tabs";
-import { batchCaptureScreenshots } from "../lib/screenshot";
 import { loadSettings } from "../lib/settings";
 import { LoadingScreen } from "./screens/LoadingScreen";
 import { SwipeScreen } from "./screens/SwipeScreen";
@@ -23,15 +22,10 @@ export function App() {
     tabRemovedExternally,
   } = useSwipeDeck();
 
-  const [captureProgress, setCaptureProgress] = useState<{
-    completed: number;
-    total: number;
-  } | null>(null);
-
   // Track whether we're mid-undo to suppress the onRemoved listener
   const [undoingTabId, setUndoingTabId] = useState<number | null>(null);
 
-  // Initialize: fetch tabs, capture screenshots, start session
+  // Initialize: fetch tabs, start session (no screenshot capture — avoids tab flickering)
   useEffect(() => {
     let cancelled = false;
 
@@ -39,26 +33,6 @@ export function App() {
       const settings = await loadSettings();
       const { tabs, duplicateGroups, excludedCount } =
         await fetchAndProcessTabs(settings);
-
-      if (cancelled) return;
-
-      // Capture screenshots if enabled
-      if (settings.captureScreenshots && tabs.length > 0) {
-        const screenshots = await batchCaptureScreenshots(
-          tabs,
-          (completed, total) => {
-            if (!cancelled) setCaptureProgress({ completed, total });
-          }
-        );
-
-        if (!cancelled) {
-          // Attach screenshots directly to tab objects before initDeck
-          for (const [tabId, dataUrl] of screenshots) {
-            const tab = tabs.find((t) => t.id === tabId);
-            if (tab) tab.screenshotUrl = dataUrl;
-          }
-        }
-      }
 
       if (!cancelled) {
         initDeck(tabs, duplicateGroups, excludedCount);

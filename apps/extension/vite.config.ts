@@ -3,15 +3,20 @@ import react from "@vitejs/plugin-react";
 import webExtension from "vite-plugin-web-extension";
 import path from "path";
 
+const browser = process.env.BROWSER ?? "chrome";
+
 export default defineConfig({
   plugins: [
     react(),
     webExtension({
       manifest: "manifest.json",
-      browser: process.env.BROWSER ?? "chrome",
+      browser,
       additionalInputs: ["src/newtab/index.html"],
     }),
   ],
+  build: {
+    outDir: `dist/${browser}`,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

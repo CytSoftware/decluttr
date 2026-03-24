@@ -7,7 +7,10 @@
     "dev:firefox": "cross-env BROWSER=firefox vite dev",
     "build:chrome": "cross-env BROWSER=chrome vite build",
     "build:firefox": "cross-env BROWSER=firefox vite build",
-    "build:all": "pnpm build:chrome && pnpm build:firefox"
+    "build:all": "pnpm build:chrome && pnpm build:firefox",
+    "package:chrome": "cd dist/chrome && zip -r ../../decluttr-chrome.zip .",
+    "package:firefox": "cd dist/firefox && zip -r ../../decluttr-firefox.zip .",
+    "package:all": "pnpm build:all && pnpm package:chrome && pnpm package:firefox"
   },
   "dependencies": {
     "react": "^18.3.0",

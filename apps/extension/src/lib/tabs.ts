@@ -14,6 +14,20 @@ function getDomain(url: string): string {
 }
 
 /**
+ * Extracts the readable path from a URL (without query/fragment).
+ */
+function getPath(url: string): string {
+  try {
+    const u = new URL(url);
+    const path = decodeURIComponent(u.pathname);
+    const search = u.search ? decodeURIComponent(u.search) : "";
+    return (path + search).replace(/\/$/, "") || "/";
+  } catch {
+    return url;
+  }
+}
+
+/**
  * Normalizes a URL for duplicate detection.
  * Strips trailing slash and fragment, keeps query params.
  */
@@ -67,6 +81,11 @@ export async function fetchAndProcessTabs(
   // Get LRU access times (for Chrome which lacks lastAccessed)
   const accessTimes = await getAccessTimes();
 
+  // Count unique windows for metadata
+  const windowIds = [...new Set(allTabs.map((t) => t.windowId))];
+  const windowIndexMap = new Map(windowIds.map((id, i) => [id, i + 1]));
+  const totalWindows = windowIds.length;
+
   // Filter
   let excludedCount = 0;
   const eligibleTabs: TabCard[] = [];
@@ -92,6 +111,14 @@ export async function fetchAndProcessTabs(
       pinned: false,
       isDuplicate: false,
       domain: getDomain(tab.url!),
+      fullPath: getPath(tab.url!),
+      tabIndex: tab.index,
+      windowIndex: windowIndexMap.get(tab.windowId!) ?? 1,
+      totalWindows,
+      status: tab.status,
+      isAudible: tab.audible ?? false,
+      isMuted: tab.mutedInfo?.muted ?? false,
+      isDiscarded: (tab as { discarded?: boolean }).discarded ?? false,
     });
   }
 
@@ -158,6 +185,7 @@ function detectDuplicates(tabs: TabCard[]): DuplicateGroup[] {
       for (const tab of groupTabs) {
         tab.isDuplicate = true;
         tab.duplicateGroupId = groupId;
+        tab.duplicateCount = groupTabs.length;
       }
       groups.push({
         groupId,

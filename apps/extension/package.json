@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build": "pnpm build:chrome && pnpm build:firefox",
     "dev:chrome": "cross-env BROWSER=chrome vite dev",
     "dev:firefox": "cross-env BROWSER=firefox vite dev",
     "build:chrome": "cross-env BROWSER=chrome vite build",

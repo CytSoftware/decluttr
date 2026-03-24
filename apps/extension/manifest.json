@@ -6,8 +6,8 @@
   "{{chrome}}.manifest_version": 3,
   "{{firefox}}.manifest_version": 2,
 
-  "permissions": ["tabs", "activeTab", "storage"],
-  "{{chrome}}.permissions": ["tabs", "activeTab", "storage", "<all_urls>"],
+  "{{chrome}}.permissions": ["tabs", "activeTab", "storage"],
+  "{{chrome}}.host_permissions": ["<all_urls>"],
   "{{firefox}}.permissions": ["tabs", "activeTab", "storage", "<all_urls>"],
 
   "{{chrome}}.action": {

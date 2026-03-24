@@ -1,0 +1,47 @@
+{
+  "name": "Decluttr",
+  "version": "0.1.0",
+  "description": "Tinder-style tab management. Swipe to declutter your browser.",
+
+  "{{chrome}}.manifest_version": 3,
+  "{{firefox}}.manifest_version": 2,
+
+  "permissions": ["tabs", "activeTab", "storage"],
+  "{{chrome}}.permissions": ["tabs", "activeTab", "storage", "<all_urls>"],
+  "{{firefox}}.permissions": ["tabs", "activeTab", "storage", "<all_urls>"],
+
+  "{{chrome}}.action": {
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "Decluttr — Swipe to declutter"
+  },
+  "{{firefox}}.browser_action": {
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "Decluttr — Swipe to declutter"
+  },
+
+  "{{chrome}}.background": {
+    "service_worker": "src/background/index.ts"
+  },
+  "{{firefox}}.background": {
+    "scripts": ["src/background/index.ts"]
+  },
+
+  "options_ui": {
+    "page": "src/options/index.html",
+    "open_in_tab": true
+  },
+
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

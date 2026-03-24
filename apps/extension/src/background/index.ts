@@ -2,8 +2,11 @@ import browser from "webextension-polyfill";
 
 const TAB_ACCESS_KEY = "decluttr_tab_access_times";
 
+// browser.action (MV3/Chrome) vs browser.browserAction (MV2/Firefox)
+const actionApi = browser.action ?? browser.browserAction;
+
 // Open Decluttr tab when toolbar icon is clicked
-browser.action.onClicked.addListener(async () => {
+actionApi.onClicked.addListener(async () => {
   // Check if a Decluttr tab is already open
   const decluttrUrl = browser.runtime.getURL("src/newtab/index.html");
   const existingTabs = await browser.tabs.query({ url: decluttrUrl });

@@ -1,0 +1,4 @@
+{
+  "extends": "@decluttr/tsconfig/react.json",
+  "include": ["src"]
+}

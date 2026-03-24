@@ -1,0 +1,9 @@
+{
+  "name": "@decluttr/config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./tailwind": "./tailwind.config.ts",
+    "./postcss": "./postcss.config.js"
+  }
+}

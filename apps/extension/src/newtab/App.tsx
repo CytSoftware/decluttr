@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import browser from "webextension-polyfill";
+import type { TabCard } from "@decluttr/types";
 import { useSwipeDeck } from "./hooks/useSwipeDeck";
 import { fetchAndProcessTabs } from "../lib/tabs";
 import { batchCaptureScreenshots } from "../lib/screenshot";
@@ -20,13 +21,15 @@ export function App() {
     undo,
     rescueTab,
     tabRemovedExternally,
-    updateScreenshot,
   } = useSwipeDeck();
 
   const [captureProgress, setCaptureProgress] = useState<{
     completed: number;
     total: number;
   } | null>(null);
+
+  // Track whether we're mid-undo to suppress the onRemoved listener
+  const [undoingTabId, setUndoingTabId] = useState<number | null>(null);
 
   // Initialize: fetch tabs, capture screenshots, start session
   useEffect(() => {
@@ -49,14 +52,15 @@ export function App() {
         );
 
         if (!cancelled) {
+          // Attach screenshots directly to tab objects before initDeck
           for (const [tabId, dataUrl] of screenshots) {
-            updateScreenshot(tabId, dataUrl);
+            const tab = tabs.find((t) => t.id === tabId);
+            if (tab) tab.screenshotUrl = dataUrl;
           }
         }
       }
 
       if (!cancelled) {
-        // Update tabs with any screenshots already set
         initDeck(tabs, duplicateGroups, excludedCount);
       }
     }
@@ -65,38 +69,85 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, [initDeck, updateScreenshot]);
+  }, [initDeck]);
 
   // Listen for externally closed tabs
   useEffect(() => {
     const listener = (tabId: number) => {
+      // Don't treat our own closes as external removals
+      if (tabId === undoingTabId) return;
       tabRemovedExternally(tabId);
     };
     browser.tabs.onRemoved.addListener(listener);
     return () => browser.tabs.onRemoved.removeListener(listener);
-  }, [tabRemovedExternally]);
+  }, [tabRemovedExternally, undoingTabId]);
 
-  // Confirm: batch close all marked tabs
-  const handleConfirm = useCallback(async () => {
-    const tabIds = state.closedTabs.map((t) => t.id);
-    if (tabIds.length > 0) {
+  // Close tab immediately on swipe left
+  const handleCloseTab = useCallback(
+    async (tab: TabCard) => {
+      // Close the actual browser tab immediately
       try {
-        await browser.tabs.remove(tabIds);
+        await browser.tabs.remove(tab.id);
       } catch {
-        // Some tabs may have already been closed
+        // Tab may already be closed
+      }
+
+      // Also close duplicates if this is a duplicate group
+      if (tab.isDuplicate && tab.duplicateGroupId) {
+        const group = state.duplicateGroups.find(
+          (g) => g.groupId === tab.duplicateGroupId
+        );
+        if (group) {
+          const otherIds = group.tabs
+            .filter((t) => t.id !== tab.id)
+            .map((t) => t.id);
+          if (otherIds.length > 0) {
+            try {
+              await browser.tabs.remove(otherIds);
+            } catch {
+              // Some may already be closed
+            }
+          }
+        }
+      }
+
+      closeTab(tab);
+    },
+    [closeTab, state.duplicateGroups]
+  );
+
+  // Undo: reopen the last closed tab
+  const handleUndo = useCallback(async () => {
+    const lastAction = state.undoStack[state.undoStack.length - 1];
+    if (!lastAction) return;
+
+    if (lastAction.type === "close") {
+      // Reopen the tab at its original URL
+      try {
+        const newTab = await browser.tabs.create({ url: lastAction.tab.url, active: false });
+        setUndoingTabId(newTab.id ?? null);
+        // Clear after a tick so the onRemoved listener doesn't fire
+        setTimeout(() => setUndoingTabId(null), 500);
+      } catch {
+        // Failed to reopen
       }
     }
 
-    // Auto-close the Decluttr tab after a brief delay
+    undo();
+  }, [undo, state.undoStack]);
+
+  // Summary: close remaining marked tabs
+  const handleConfirm = useCallback(async () => {
+    // Tabs were already closed during swiping, just close the Decluttr tab
     setTimeout(async () => {
       const currentTab = await browser.tabs.getCurrent();
       if (currentTab?.id) {
         await browser.tabs.remove(currentTab.id);
       }
-    }, 1500);
-  }, [state.closedTabs]);
+    }, 1000);
+  }, []);
 
-  // Cancel: close the Decluttr tab without closing any tabs
+  // Cancel: close the Decluttr tab
   const handleCancel = useCallback(async () => {
     const currentTab = await browser.tabs.getCurrent();
     if (currentTab?.id) {
@@ -125,9 +176,9 @@ export function App() {
           excludedCount={state.excludedCount}
           canUndo={canUndo}
           progress={progress}
-          onSwipeLeft={closeTab}
+          onSwipeLeft={handleCloseTab}
           onSwipeRight={keepTab}
-          onUndo={undo}
+          onUndo={handleUndo}
         />
       )}
 

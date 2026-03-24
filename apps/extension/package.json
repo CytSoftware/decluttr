@@ -14,16 +14,17 @@
     "package:all": "pnpm build:all && pnpm package:chrome && pnpm package:firefox"
   },
   "dependencies": {
+    "@decluttr/types": "workspace:*",
+    "@decluttr/ui": "workspace:*",
+    "@react-spring/web": "^9.7.5",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-tinder-card": "^1.6.4",
-    "webextension-polyfill": "^0.12.0",
-    "@decluttr/types": "workspace:*",
-    "@decluttr/ui": "workspace:*"
+    "webextension-polyfill": "^0.12.0"
   },
   "devDependencies": {
-    "@decluttr/tsconfig": "workspace:*",
     "@decluttr/config": "workspace:*",
+    "@decluttr/tsconfig": "workspace:*",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@types/webextension-polyfill": "^0.12.0",

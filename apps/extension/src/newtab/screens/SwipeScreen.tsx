@@ -9,6 +9,7 @@ interface SwipeScreenProps {
   progress: { current: number; total: number };
   onSwipeLeft: (tab: TabCardType) => void;
   onSwipeRight: (tab: TabCardType) => void;
+  onSwipeUp: (tab: TabCardType) => void;
   onUndo: () => void;
 }
 
@@ -20,6 +21,7 @@ export function SwipeScreen({
   progress,
   onSwipeLeft,
   onSwipeRight,
+  onSwipeUp,
   onUndo,
 }: SwipeScreenProps) {
   return (
@@ -33,6 +35,7 @@ export function SwipeScreen({
         progress={progress}
         onSwipeLeft={onSwipeLeft}
         onSwipeRight={onSwipeRight}
+        onSwipeUp={onSwipeUp}
         onUndo={onUndo}
       />
     </div>

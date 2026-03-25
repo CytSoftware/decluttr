@@ -1,6 +1,7 @@
 import { useReducer, useCallback } from "react";
 import type {
   TabCard,
+  SavedTab,
   DuplicateGroup,
   DeckState,
   SessionState,
@@ -22,10 +23,10 @@ type Action =
   | { type: "SET_STATE"; deckState: DeckState }
   | { type: "CLOSE_TAB"; tab: TabCard }
   | { type: "KEEP_TAB"; tab: TabCard }
+  | { type: "SAVE_TAB"; tab: TabCard }
   | { type: "UNDO" }
   | { type: "RESCUE_TAB"; tabId: number }
-  | { type: "TAB_REMOVED_EXTERNALLY"; tabId: number }
-  | { type: "UPDATE_SCREENSHOT"; tabId: number; screenshotUrl: string };
+  | { type: "TAB_REMOVED_EXTERNALLY"; tabId: number };
 
 function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
   switch (action.type) {
@@ -39,6 +40,7 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
         currentIndex: 0,
         keptTabs: [],
         closedTabs: [],
+        savedTabs: [],
         undoStack: [],
         startTime: Date.now(),
         deckState,
@@ -52,7 +54,6 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
       const newIndex = state.currentIndex + 1;
       const closedTabs = [...state.closedTabs, action.tab];
 
-      // If this tab is a duplicate, also close the other duplicates
       let additionalClosed: TabCard[] = [];
       if (action.tab.isDuplicate && action.tab.duplicateGroupId) {
         const group = state.duplicateGroups.find(
@@ -73,11 +74,7 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
         closedTabs: allClosed,
         undoStack: [
           ...state.undoStack,
-          {
-            type: "close",
-            tab: action.tab,
-            previousIndex: state.currentIndex,
-          },
+          { type: "close", tab: action.tab, previousIndex: state.currentIndex },
         ],
         deckState,
       };
@@ -86,7 +83,6 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
     case "KEEP_TAB": {
       const newIndex = state.currentIndex + 1;
 
-      // If this is a duplicate, keep the most recent one and close the rest
       let additionalClosed: TabCard[] = [];
       if (action.tab.isDuplicate && action.tab.duplicateGroupId) {
         const group = state.duplicateGroups.find(
@@ -107,11 +103,25 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
         closedTabs: [...state.closedTabs, ...additionalClosed],
         undoStack: [
           ...state.undoStack,
-          {
-            type: "keep",
-            tab: action.tab,
-            previousIndex: state.currentIndex,
-          },
+          { type: "keep", tab: action.tab, previousIndex: state.currentIndex },
+        ],
+        deckState,
+      };
+    }
+
+    case "SAVE_TAB": {
+      const newIndex = state.currentIndex + 1;
+      const saved: SavedTab = { ...action.tab, savedAt: Date.now() };
+      const deckState =
+        newIndex >= state.tabs.length ? "summary" : state.deckState;
+
+      return {
+        ...state,
+        currentIndex: newIndex,
+        savedTabs: [...state.savedTabs, saved],
+        undoStack: [
+          ...state.undoStack,
+          { type: "save", tab: action.tab, previousIndex: state.currentIndex },
         ],
         deckState,
       };
@@ -125,34 +135,28 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
 
       let keptTabs = state.keptTabs;
       let closedTabs = state.closedTabs;
+      let savedTabs = state.savedTabs;
 
       if (lastAction.type === "close") {
-        // Remove the tab (and its duplicates) from closedTabs
         const tabsToRemove = new Set([lastAction.tab.id]);
-        if (
-          lastAction.tab.isDuplicate &&
-          lastAction.tab.duplicateGroupId
-        ) {
+        if (lastAction.tab.isDuplicate && lastAction.tab.duplicateGroupId) {
           const group = state.duplicateGroups.find(
             (g) => g.groupId === lastAction.tab.duplicateGroupId
           );
           group?.tabs.forEach((t) => tabsToRemove.add(t.id));
         }
         closedTabs = closedTabs.filter((t) => !tabsToRemove.has(t.id));
-      } else {
-        // Remove from keptTabs
+      } else if (lastAction.type === "keep") {
         keptTabs = keptTabs.filter((t) => t.id !== lastAction.tab.id);
-        // Also remove any duplicate-closed tabs
-        if (
-          lastAction.tab.isDuplicate &&
-          lastAction.tab.duplicateGroupId
-        ) {
+        if (lastAction.tab.isDuplicate && lastAction.tab.duplicateGroupId) {
           const group = state.duplicateGroups.find(
             (g) => g.groupId === lastAction.tab.duplicateGroupId
           );
           const dupIds = new Set(group?.tabs.map((t) => t.id) ?? []);
           closedTabs = closedTabs.filter((t) => !dupIds.has(t.id));
         }
+      } else if (lastAction.type === "save") {
+        savedTabs = savedTabs.filter((t) => t.url !== lastAction.tab.url);
       }
 
       return {
@@ -160,6 +164,7 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
         currentIndex: lastAction.previousIndex,
         keptTabs,
         closedTabs,
+        savedTabs,
         undoStack: newUndoStack,
         deckState: "swiping",
       };
@@ -188,16 +193,6 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
       };
     }
 
-    case "UPDATE_SCREENSHOT":
-      return {
-        ...state,
-        tabs: state.tabs.map((t) =>
-          t.id === action.tabId
-            ? { ...t, screenshotUrl: action.screenshotUrl }
-            : t
-        ),
-      };
-
     default:
       return state;
   }
@@ -209,6 +204,7 @@ const initialState: SwipeDeckState = {
   currentIndex: 0,
   keptTabs: [],
   closedTabs: [],
+  savedTabs: [],
   excludedCount: 0,
   startTime: Date.now(),
   deckState: "loading",
@@ -219,11 +215,7 @@ export function useSwipeDeck() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const initDeck = useCallback(
-    (
-      tabs: TabCard[],
-      duplicateGroups: DuplicateGroup[],
-      excludedCount: number
-    ) => {
+    (tabs: TabCard[], duplicateGroups: DuplicateGroup[], excludedCount: number) => {
       dispatch({ type: "INIT", tabs, duplicateGroups, excludedCount });
     },
     []
@@ -237,6 +229,10 @@ export function useSwipeDeck() {
     dispatch({ type: "KEEP_TAB", tab });
   }, []);
 
+  const saveTab = useCallback((tab: TabCard) => {
+    dispatch({ type: "SAVE_TAB", tab });
+  }, []);
+
   const undo = useCallback(() => {
     dispatch({ type: "UNDO" });
   }, []);
@@ -248,13 +244,6 @@ export function useSwipeDeck() {
   const tabRemovedExternally = useCallback((tabId: number) => {
     dispatch({ type: "TAB_REMOVED_EXTERNALLY", tabId });
   }, []);
-
-  const updateScreenshot = useCallback(
-    (tabId: number, screenshotUrl: string) => {
-      dispatch({ type: "UPDATE_SCREENSHOT", tabId, screenshotUrl });
-    },
-    []
-  );
 
   const setDeckState = useCallback((deckState: DeckState) => {
     dispatch({ type: "SET_STATE", deckState });
@@ -279,10 +268,10 @@ export function useSwipeDeck() {
     initDeck,
     closeTab,
     keepTab,
+    saveTab,
     undo,
     rescueTab,
     tabRemovedExternally,
-    updateScreenshot,
     setDeckState,
   };
 }

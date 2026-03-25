@@ -15,6 +15,7 @@ interface SwipeDeckProps {
   progress: { current: number; total: number };
   onSwipeLeft: (tab: TabCardType) => void;
   onSwipeRight: (tab: TabCardType) => void;
+  onSwipeUp: (tab: TabCardType) => void;
   onUndo: () => void;
 }
 
@@ -30,6 +31,7 @@ export function SwipeDeck({
   progress,
   onSwipeLeft,
   onSwipeRight,
+  onSwipeUp,
   onUndo,
 }: SwipeDeckProps) {
   const cardRefs = useRef<Map<number, CardRef>>(new Map());
@@ -42,31 +44,36 @@ export function SwipeDeck({
         onSwipeLeft(tab);
       } else if (direction === "right") {
         onSwipeRight(tab);
+      } else if (direction === "up") {
+        onSwipeUp(tab);
       }
     },
-    [onSwipeLeft, onSwipeRight]
+    [onSwipeLeft, onSwipeRight, onSwipeUp]
   );
 
   const swipeLeft = useCallback(() => {
     if (!currentTab) return;
-    const ref = cardRefs.current.get(currentTab.id);
-    ref?.swipe("left");
+    cardRefs.current.get(currentTab.id)?.swipe("left");
   }, [currentTab]);
 
   const swipeRight = useCallback(() => {
     if (!currentTab) return;
-    const ref = cardRefs.current.get(currentTab.id);
-    ref?.swipe("right");
+    cardRefs.current.get(currentTab.id)?.swipe("right");
+  }, [currentTab]);
+
+  const swipeUp = useCallback(() => {
+    if (!currentTab) return;
+    cardRefs.current.get(currentTab.id)?.swipe("up");
   }, [currentTab]);
 
   useKeyboardShortcuts({
     onSwipeLeft: swipeLeft,
     onSwipeRight: swipeRight,
+    onSwipeUp: swipeUp,
     onUndo,
     enabled: currentTab !== null,
   });
 
-  // Only render current + next 2 cards for performance
   const visibleTabs = useMemo(() => {
     return tabs.slice(currentIndex, currentIndex + 3).reverse();
   }, [tabs, currentIndex]);
@@ -85,12 +92,10 @@ export function SwipeDeck({
             <TinderCard
               key={tab.id}
               ref={(ref: CardRef | null) => {
-                if (ref) {
-                  cardRefs.current.set(tab.id, ref);
-                }
+                if (ref) cardRefs.current.set(tab.id, ref);
               }}
               onSwipe={(dir: string) => handleSwipe(dir, tab)}
-              preventSwipe={["up", "down"]}
+              preventSwipe={["down"]}
               flickOnSwipe
               className="absolute inset-0"
             >
@@ -110,11 +115,14 @@ export function SwipeDeck({
         {/* Swipe direction indicators */}
         {currentTab && (
           <>
-            <div className="absolute top-4 left-4 text-close font-bold text-lg opacity-0 pointer-events-none z-50 swipe-indicator-left">
+            <div className="absolute top-4 left-4 text-close font-bold text-lg opacity-0 pointer-events-none z-50">
               CLOSE
             </div>
-            <div className="absolute top-4 right-4 text-keep font-bold text-lg opacity-0 pointer-events-none z-50 swipe-indicator-right">
+            <div className="absolute top-4 right-4 text-keep font-bold text-lg opacity-0 pointer-events-none z-50">
               KEEP
+            </div>
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 text-primary font-bold text-lg opacity-0 pointer-events-none z-50">
+              SAVE
             </div>
           </>
         )}
@@ -122,6 +130,7 @@ export function SwipeDeck({
 
       <SwipeButtons
         onClose={swipeLeft}
+        onSave={swipeUp}
         onKeep={swipeRight}
         onUndo={onUndo}
         canUndo={canUndo}
@@ -132,14 +141,14 @@ export function SwipeDeck({
       <div className="flex items-center gap-4 text-[10px] text-text-muted">
         <span>
           <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px]">&larr;</kbd>{" "}
-          or{" "}
-          <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px]">J</kbd>{" "}
           Close
         </span>
         <span>
+          <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px]">&uarr;</kbd>{" "}
+          Save
+        </span>
+        <span>
           <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px]">&rarr;</kbd>{" "}
-          or{" "}
-          <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px]">K</kbd>{" "}
           Keep
         </span>
         <span>

@@ -4,6 +4,7 @@ import type { TabCard } from "@decluttr/types";
 import { useSwipeDeck } from "./hooks/useSwipeDeck";
 import { fetchAndProcessTabs } from "../lib/tabs";
 import { loadSettings } from "../lib/settings";
+import { addSavedTab, removeSavedTab } from "../lib/saved";
 import { LoadingScreen } from "./screens/LoadingScreen";
 import { SwipeScreen } from "./screens/SwipeScreen";
 import { SummaryScreen } from "./screens/SummaryScreen";
@@ -17,15 +18,15 @@ export function App() {
     initDeck,
     closeTab,
     keepTab,
+    saveTab,
     undo,
     rescueTab,
     tabRemovedExternally,
   } = useSwipeDeck();
 
-  // Track whether we're mid-undo to suppress the onRemoved listener
   const [undoingTabId, setUndoingTabId] = useState<number | null>(null);
 
-  // Initialize: fetch tabs, start session (no screenshot capture — avoids tab flickering)
+  // Initialize: fetch tabs, start session
   useEffect(() => {
     let cancelled = false;
 
@@ -48,7 +49,6 @@ export function App() {
   // Listen for externally closed tabs
   useEffect(() => {
     const listener = (tabId: number) => {
-      // Don't treat our own closes as external removals
       if (tabId === undoingTabId) return;
       tabRemovedExternally(tabId);
     };
@@ -59,28 +59,18 @@ export function App() {
   // Close tab immediately on swipe left
   const handleCloseTab = useCallback(
     async (tab: TabCard) => {
-      // Close the actual browser tab immediately
       try {
         await browser.tabs.remove(tab.id);
-      } catch {
-        // Tab may already be closed
-      }
+      } catch { /* already closed */ }
 
-      // Also close duplicates if this is a duplicate group
       if (tab.isDuplicate && tab.duplicateGroupId) {
         const group = state.duplicateGroups.find(
           (g) => g.groupId === tab.duplicateGroupId
         );
         if (group) {
-          const otherIds = group.tabs
-            .filter((t) => t.id !== tab.id)
-            .map((t) => t.id);
+          const otherIds = group.tabs.filter((t) => t.id !== tab.id).map((t) => t.id);
           if (otherIds.length > 0) {
-            try {
-              await browser.tabs.remove(otherIds);
-            } catch {
-              // Some may already be closed
-            }
+            try { await browser.tabs.remove(otherIds); } catch { /* */ }
           }
         }
       }
@@ -90,58 +80,66 @@ export function App() {
     [closeTab, state.duplicateGroups]
   );
 
-  // Undo: reopen the last closed tab
+  // Save tab for later: close tab + persist to storage
+  const handleSaveTab = useCallback(
+    async (tab: TabCard) => {
+      // Close the browser tab
+      try {
+        await browser.tabs.remove(tab.id);
+      } catch { /* already closed */ }
+
+      // Persist to storage
+      await addSavedTab({ ...tab, savedAt: Date.now() });
+
+      // Update state
+      saveTab(tab);
+    },
+    [saveTab]
+  );
+
+  // Undo last action
   const handleUndo = useCallback(async () => {
     const lastAction = state.undoStack[state.undoStack.length - 1];
     if (!lastAction) return;
 
-    if (lastAction.type === "close") {
-      // Reopen the tab at its original URL
+    if (lastAction.type === "close" || lastAction.type === "save") {
+      // Reopen the tab
       try {
         const newTab = await browser.tabs.create({ url: lastAction.tab.url, active: false });
         setUndoingTabId(newTab.id ?? null);
-        // Clear after a tick so the onRemoved listener doesn't fire
         setTimeout(() => setUndoingTabId(null), 500);
-      } catch {
-        // Failed to reopen
+      } catch { /* failed to reopen */ }
+
+      // If it was a save, also remove from persistent storage
+      if (lastAction.type === "save") {
+        await removeSavedTab(lastAction.tab.url);
       }
     }
 
     undo();
   }, [undo, state.undoStack]);
 
-  // Summary: close remaining marked tabs
+  // Summary confirm: close the Decluttr tab
   const handleConfirm = useCallback(async () => {
-    // Tabs were already closed during swiping, just close the Decluttr tab
     setTimeout(async () => {
       const currentTab = await browser.tabs.getCurrent();
-      if (currentTab?.id) {
-        await browser.tabs.remove(currentTab.id);
-      }
+      if (currentTab?.id) await browser.tabs.remove(currentTab.id);
     }, 1000);
   }, []);
 
-  // Cancel: close the Decluttr tab
   const handleCancel = useCallback(async () => {
     const currentTab = await browser.tabs.getCurrent();
-    if (currentTab?.id) {
-      await browser.tabs.remove(currentTab.id);
-    }
+    if (currentTab?.id) await browser.tabs.remove(currentTab.id);
   }, []);
 
-  // Close the Decluttr tab (empty state)
   const handleClose = useCallback(async () => {
     const currentTab = await browser.tabs.getCurrent();
-    if (currentTab?.id) {
-      await browser.tabs.remove(currentTab.id);
-    }
+    if (currentTab?.id) await browser.tabs.remove(currentTab.id);
   }, []);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      {state.deckState === "loading" && (
-        <LoadingScreen />
-      )}
+      {state.deckState === "loading" && <LoadingScreen />}
 
       {state.deckState === "swiping" && (
         <SwipeScreen
@@ -152,6 +150,7 @@ export function App() {
           progress={progress}
           onSwipeLeft={handleCloseTab}
           onSwipeRight={keepTab}
+          onSwipeUp={handleSaveTab}
           onUndo={handleUndo}
         />
       )}
@@ -160,6 +159,7 @@ export function App() {
         <SummaryScreen
           closedTabs={state.closedTabs}
           keptTabs={state.keptTabs}
+          savedTabs={state.savedTabs}
           startTime={state.startTime}
           onConfirm={handleConfirm}
           onCancel={handleCancel}

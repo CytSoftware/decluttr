@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or Discussion
+    url: https://github.com/CytSoftware/decluttr/issues
+    about: For general questions, open an issue and we'll label it accordingly.

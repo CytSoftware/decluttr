@@ -18,3 +18,4 @@ export const NEW_TAB_URLS = [
 ];
 
 export const TAB_ACCESS_KEY = "decluttr_tab_access_times";
+export const SAVED_TABS_KEY = "decluttr_saved_tabs";

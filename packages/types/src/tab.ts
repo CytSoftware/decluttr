@@ -26,6 +26,10 @@ export interface DuplicateGroup {
   tabs: TabCard[];
 }
 
+export interface SavedTab extends TabCard {
+  savedAt: number;
+}
+
 export type DeckState = "loading" | "swiping" | "summary" | "empty";
 
 export interface SessionState {
@@ -34,14 +38,15 @@ export interface SessionState {
   currentIndex: number;
   keptTabs: TabCard[];
   closedTabs: TabCard[];
+  savedTabs: SavedTab[];
   excludedCount: number;
   startTime: number;
 }
 
-export type SwipeDirection = "left" | "right";
+export type SwipeDirection = "left" | "right" | "up";
 
 export interface UndoAction {
-  type: "close" | "keep";
+  type: "close" | "keep" | "save";
   tab: TabCard;
   previousIndex: number;
 }

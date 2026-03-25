@@ -3,6 +3,7 @@ import { useEffect } from "react";
 interface KeyboardActions {
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  onSwipeUp: () => void;
   onUndo: () => void;
   enabled: boolean;
 }
@@ -10,6 +11,7 @@ interface KeyboardActions {
 export function useKeyboardShortcuts({
   onSwipeLeft,
   onSwipeRight,
+  onSwipeUp,
   onUndo,
   enabled,
 }: KeyboardActions) {
@@ -17,7 +19,6 @@ export function useKeyboardShortcuts({
     if (!enabled) return;
 
     const handler = (e: KeyboardEvent) => {
-      // Don't capture if user is in an input field
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement
@@ -36,6 +37,11 @@ export function useKeyboardShortcuts({
           e.preventDefault();
           onSwipeRight();
           break;
+        case "ArrowUp":
+        case "s":
+          e.preventDefault();
+          onSwipeUp();
+          break;
         case "u":
           e.preventDefault();
           onUndo();
@@ -51,5 +57,5 @@ export function useKeyboardShortcuts({
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [onSwipeLeft, onSwipeRight, onUndo, enabled]);
+  }, [onSwipeLeft, onSwipeRight, onSwipeUp, onUndo, enabled]);
 }

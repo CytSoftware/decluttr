@@ -11,7 +11,7 @@ export default defineConfig({
     webExtension({
       manifest: "manifest.json",
       browser,
-      additionalInputs: ["src/newtab/index.html", "src/saved/index.html"],
+      additionalInputs: ["src/newtab/index.html", "src/saved/index.html", "src/popup/index.html"],
       disableAutoLaunch: true,
     }),
   ],

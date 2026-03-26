@@ -52,26 +52,13 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
 
     case "CLOSE_TAB": {
       const newIndex = state.currentIndex + 1;
-      const closedTabs = [...state.closedTabs, action.tab];
-
-      let additionalClosed: TabCard[] = [];
-      if (action.tab.isDuplicate && action.tab.duplicateGroupId) {
-        const group = state.duplicateGroups.find(
-          (g) => g.groupId === action.tab.duplicateGroupId
-        );
-        if (group) {
-          additionalClosed = group.tabs.filter((t) => t.id !== action.tab.id);
-        }
-      }
-
-      const allClosed = [...closedTabs, ...additionalClosed];
       const deckState =
         newIndex >= state.tabs.length ? "summary" : state.deckState;
 
       return {
         ...state,
         currentIndex: newIndex,
-        closedTabs: allClosed,
+        closedTabs: [...state.closedTabs, action.tab],
         undoStack: [
           ...state.undoStack,
           { type: "close", tab: action.tab, previousIndex: state.currentIndex },
@@ -82,17 +69,6 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
 
     case "KEEP_TAB": {
       const newIndex = state.currentIndex + 1;
-
-      let additionalClosed: TabCard[] = [];
-      if (action.tab.isDuplicate && action.tab.duplicateGroupId) {
-        const group = state.duplicateGroups.find(
-          (g) => g.groupId === action.tab.duplicateGroupId
-        );
-        if (group) {
-          additionalClosed = group.tabs.filter((t) => t.id !== action.tab.id);
-        }
-      }
-
       const deckState =
         newIndex >= state.tabs.length ? "summary" : state.deckState;
 
@@ -100,7 +76,6 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
         ...state,
         currentIndex: newIndex,
         keptTabs: [...state.keptTabs, action.tab],
-        closedTabs: [...state.closedTabs, ...additionalClosed],
         undoStack: [
           ...state.undoStack,
           { type: "keep", tab: action.tab, previousIndex: state.currentIndex },
@@ -138,23 +113,9 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
       let savedTabs = state.savedTabs;
 
       if (lastAction.type === "close") {
-        const tabsToRemove = new Set([lastAction.tab.id]);
-        if (lastAction.tab.isDuplicate && lastAction.tab.duplicateGroupId) {
-          const group = state.duplicateGroups.find(
-            (g) => g.groupId === lastAction.tab.duplicateGroupId
-          );
-          group?.tabs.forEach((t) => tabsToRemove.add(t.id));
-        }
-        closedTabs = closedTabs.filter((t) => !tabsToRemove.has(t.id));
+        closedTabs = closedTabs.filter((t) => t.id !== lastAction.tab.id);
       } else if (lastAction.type === "keep") {
         keptTabs = keptTabs.filter((t) => t.id !== lastAction.tab.id);
-        if (lastAction.tab.isDuplicate && lastAction.tab.duplicateGroupId) {
-          const group = state.duplicateGroups.find(
-            (g) => g.groupId === lastAction.tab.duplicateGroupId
-          );
-          const dupIds = new Set(group?.tabs.map((t) => t.id) ?? []);
-          closedTabs = closedTabs.filter((t) => !dupIds.has(t.id));
-        }
       } else if (lastAction.type === "save") {
         savedTabs = savedTabs.filter((t) => t.url !== lastAction.tab.url);
       }

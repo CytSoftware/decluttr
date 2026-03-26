@@ -2,26 +2,8 @@ import browser from "webextension-polyfill";
 
 const TAB_ACCESS_KEY = "decluttr_tab_access_times";
 
-// browser.action (MV3/Chrome) vs browser.browserAction (MV2/Firefox)
-const actionApi = browser.action ?? browser.browserAction;
-
-// Open Decluttr tab when toolbar icon is clicked
-actionApi.onClicked.addListener(async () => {
-  // Check if a Decluttr tab is already open
-  const decluttrUrl = browser.runtime.getURL("src/newtab/index.html");
-  const existingTabs = await browser.tabs.query({ url: decluttrUrl });
-
-  if (existingTabs.length > 0 && existingTabs[0].id) {
-    // Focus existing Decluttr tab
-    await browser.tabs.update(existingTabs[0].id, { active: true });
-    if (existingTabs[0].windowId) {
-      await browser.windows.update(existingTabs[0].windowId, { focused: true });
-    }
-  } else {
-    // Open new Decluttr tab
-    await browser.tabs.create({ url: decluttrUrl });
-  }
-});
+// Toolbar click is handled by the popup (manifest default_popup).
+// No onClicked listener needed.
 
 // Track tab access times for LRU sorting (Chrome doesn't expose lastAccessed)
 browser.tabs.onActivated.addListener(async ({ tabId }) => {

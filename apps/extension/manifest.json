@@ -16,7 +16,8 @@
       "48": "icons/icon-48.png",
       "128": "icons/icon-128.png"
     },
-    "default_title": "Decluttr — Swipe to declutter"
+    "default_title": "Decluttr — Swipe to declutter",
+    "default_popup": "src/popup/index.html"
   },
   "{{firefox}}.browser_action": {
     "default_icon": {
@@ -24,7 +25,8 @@
       "48": "icons/icon-48.png",
       "128": "icons/icon-128.png"
     },
-    "default_title": "Decluttr — Swipe to declutter"
+    "default_title": "Decluttr — Swipe to declutter",
+    "default_popup": "src/popup/index.html"
   },
 
   "{{chrome}}.background": {

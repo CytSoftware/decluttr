@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import browser from "webextension-polyfill";
 import type { TabCard } from "@decluttr/types";
 import { useSwipeDeck } from "./hooks/useSwipeDeck";
@@ -25,6 +25,7 @@ export function App() {
   } = useSwipeDeck();
 
   const [undoingTabId, setUndoingTabId] = useState<number | null>(null);
+  const closingTabIds = useRef<Set<number>>(new Set());
 
   // Initialize: fetch tabs, start session
   useEffect(() => {
@@ -46,10 +47,14 @@ export function App() {
     };
   }, [initDeck]);
 
-  // Listen for externally closed tabs
+  // Listen for externally closed tabs (skip tabs we closed ourselves)
   useEffect(() => {
     const listener = (tabId: number) => {
       if (tabId === undoingTabId) return;
+      if (closingTabIds.current.has(tabId)) {
+        closingTabIds.current.delete(tabId);
+        return;
+      }
       tabRemovedExternally(tabId);
     };
     browser.tabs.onRemoved.addListener(listener);
@@ -59,30 +64,20 @@ export function App() {
   // Close tab immediately on swipe left
   const handleCloseTab = useCallback(
     async (tab: TabCard) => {
+      closingTabIds.current.add(tab.id);
       try {
         await browser.tabs.remove(tab.id);
       } catch { /* already closed */ }
 
-      if (tab.isDuplicate && tab.duplicateGroupId) {
-        const group = state.duplicateGroups.find(
-          (g) => g.groupId === tab.duplicateGroupId
-        );
-        if (group) {
-          const otherIds = group.tabs.filter((t) => t.id !== tab.id).map((t) => t.id);
-          if (otherIds.length > 0) {
-            try { await browser.tabs.remove(otherIds); } catch { /* */ }
-          }
-        }
-      }
-
       closeTab(tab);
     },
-    [closeTab, state.duplicateGroups]
+    [closeTab]
   );
 
   // Save tab for later: close tab + persist to storage
   const handleSaveTab = useCallback(
     async (tab: TabCard) => {
+      closingTabIds.current.add(tab.id);
       // Close the browser tab
       try {
         await browser.tabs.remove(tab.id);

@@ -25,5 +25,8 @@ dist/
 *.crx
 *.xpi
 
+# Internal / private docs
+.internal/
+
 # Misc
 artifacts/

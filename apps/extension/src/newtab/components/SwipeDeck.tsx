@@ -1,4 +1,4 @@
-import { useRef, useCallback, useMemo } from "react";
+import { useRef, useState, useCallback, useMemo } from "react";
 import TinderCard from "react-tinder-card";
 import type { TabCard as TabCardType } from "@decluttr/types";
 import { TabCard } from "./TabCard";
@@ -35,11 +35,13 @@ export function SwipeDeck({
   onUndo,
 }: SwipeDeckProps) {
   const cardRefs = useRef<Map<number, CardRef>>(new Map());
+  const [swipeDirection, setSwipeDirection] = useState<{ id: number; dir: string } | null>(null);
 
   const currentTab = currentIndex < tabs.length ? tabs[currentIndex] : null;
 
   const handleSwipe = useCallback(
     (direction: string, tab: TabCardType) => {
+      setSwipeDirection(null);
       if (direction === "left") {
         onSwipeLeft(tab);
       } else if (direction === "right") {
@@ -95,6 +97,12 @@ export function SwipeDeck({
                 if (ref) cardRefs.current.set(tab.id, ref);
               }}
               onSwipe={(dir: string) => handleSwipe(dir, tab)}
+              onSwipeRequirementFulfilled={(dir: string) =>
+                setSwipeDirection({ id: tab.id, dir })
+              }
+              onSwipeRequirementUnfulfilled={() => setSwipeDirection(null)}
+              swipeRequirementType="position"
+              swipeThreshold={100}
               preventSwipe={["down"]}
               flickOnSwipe
               className="absolute inset-0"
@@ -115,13 +123,22 @@ export function SwipeDeck({
         {/* Swipe direction indicators */}
         {currentTab && (
           <>
-            <div className="absolute top-4 left-4 text-close font-bold text-lg opacity-0 pointer-events-none z-50">
+            <div
+              className="absolute top-4 left-4 px-3 py-1 rounded-lg border-2 border-close text-close font-bold text-lg -rotate-12 pointer-events-none z-50 transition-opacity duration-150"
+              style={{ opacity: swipeDirection?.id === currentTab.id && swipeDirection.dir === "left" ? 1 : 0 }}
+            >
               CLOSE
             </div>
-            <div className="absolute top-4 right-4 text-keep font-bold text-lg opacity-0 pointer-events-none z-50">
+            <div
+              className="absolute top-4 right-4 px-3 py-1 rounded-lg border-2 border-keep text-keep font-bold text-lg rotate-12 pointer-events-none z-50 transition-opacity duration-150"
+              style={{ opacity: swipeDirection?.id === currentTab.id && swipeDirection.dir === "right" ? 1 : 0 }}
+            >
               KEEP
             </div>
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 text-primary font-bold text-lg opacity-0 pointer-events-none z-50">
+            <div
+              className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg border-2 border-primary text-primary font-bold text-lg pointer-events-none z-50 transition-opacity duration-150"
+              style={{ opacity: swipeDirection?.id === currentTab.id && swipeDirection.dir === "up" ? 1 : 0 }}
+            >
               SAVE
             </div>
           </>

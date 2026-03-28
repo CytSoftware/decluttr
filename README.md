@@ -1,6 +1,10 @@
 <p align="center">
-  <h1 align="center">Decluttr</h1>
-  <p align="center">Tinder-style tab management. Swipe left to close, right to keep.<br/>Clean up 50 tabs in 60 seconds.</p>
+  <img src="docs/logo.png" alt="Decluttr" width="200" />
+</p>
+
+<p align="center">
+  <strong>Tinder-style tab management. Swipe left to close, right to keep.</strong><br/>
+  Clean up 50 tabs in 60 seconds.
 </p>
 
 <p align="center">
@@ -12,12 +16,6 @@
 </p>
 
 ---
-
-<!-- TODO: Replace with actual demo GIF
-<p align="center">
-  <img src="docs/demo.gif" alt="Decluttr demo" width="400" />
-</p>
--->
 
 ## What is Decluttr?
 

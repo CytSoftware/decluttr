@@ -4,8 +4,9 @@ export function Navbar({ stars }: { stars: number | null }) {
   return (
     <nav className="fixed top-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-b border-border z-50">
       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-        <a href="/" className="text-lg font-bold text-text-primary">
-          Decluttr
+        <a href="/" className="flex items-center gap-1.5">
+          <img src="/decluttr-icon-only.svg" alt="" className="h-7" />
+          <img src="/decluttr-wordmark.svg" alt="Decluttr" className="h-4 hidden sm:block" />
         </a>
         <div className="flex items-center gap-3">
           <a

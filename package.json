@@ -1,6 +1,8 @@
 {
   "name": "decluttr",
+  "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
@@ -8,9 +10,12 @@
     "dev:extension:chrome": "pnpm --filter @decluttr/extension dev:chrome",
     "dev:extension:firefox": "pnpm --filter @decluttr/extension dev:firefox",
     "build:extension": "pnpm --filter @decluttr/extension build:all",
-    "dev:landing": "pnpm --filter @decluttr/landing dev"
+    "dev:landing": "pnpm --filter @decluttr/landing dev",
+    "release": "release-it"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.6",
+    "release-it": "^19.2.4",
     "turbo": "^2.4.0",
     "typescript": "^5.7.0"
   },

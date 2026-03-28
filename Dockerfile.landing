@@ -18,11 +18,7 @@ FROM node:20-alpine AS builder
 RUN corepack enable
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/landing/node_modules ./apps/landing/node_modules
-COPY --from=deps /app/packages/config/node_modules ./packages/config/node_modules
-COPY --from=deps /app/packages/types/node_modules ./packages/types/node_modules
-COPY --from=deps /app/packages/ui/node_modules ./packages/ui/node_modules
+COPY --from=deps /app ./
 COPY . .
 
 RUN pnpm turbo build --filter=@decluttr/landing

@@ -32,7 +32,10 @@ export function App() {
 
   return (
     <div className="w-[220px] p-3 space-y-2">
-      <h1 className="text-sm font-bold text-text-primary text-center">Decluttr</h1>
+      <div className="flex items-center justify-center gap-1.5">
+        <img src="/icons/icon-32.png" alt="" className="w-5 h-5" />
+        <h1 className="text-sm font-bold text-text-primary">Decluttr</h1>
+      </div>
 
       <button
         onClick={startDecluttering}

@@ -4,9 +4,7 @@
 
 If you discover a security vulnerability in Decluttr, **please do not open a public issue.**
 
-Instead, report it privately by emailing the maintainers or using [GitHub's private vulnerability reporting](https://github.com/CytSoftware/decluttr/security/advisories/new).
-
-<!-- TODO: Add a security contact email -->
+Instead, report it privately by emailing **security@getdecluttr.app** or using [GitHub's private vulnerability reporting](https://github.com/CytSoftware/decluttr/security/advisories/new).
 
 ## Scope
 

@@ -45,5 +45,15 @@
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
+  },
+
+  "{{firefox}}.browser_specific_settings": {
+    "gecko": {
+      "id": "decluttr@getdecluttr.app",
+      "data_collection_permissions": {
+        "required": ["none"],
+        "optional": ["technicalAndInteraction"]
+      }
+    }
   }
 }

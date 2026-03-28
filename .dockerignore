@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.turbo/
+.git/
+.env
+.env.*
+*.log
+*.zip
+*.crx
+*.xpi
+.DS_Store
+artifacts/

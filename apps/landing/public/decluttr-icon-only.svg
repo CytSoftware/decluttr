@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!--
+    Decluttr Icon — Centered & balanced for favicon/app icon use.
+    The icon's visual center accounts for the motion lines on the left
+    and the tilted document extending upward.
+  -->
+
+  <!-- Paper stack (5 layers, centered at ~138, 168) -->
+  <rect x="74" y="183" width="128" height="10" rx="3" fill="#1E5C8A" opacity="0.80"/>
+  <rect x="68" y="170" width="140" height="12" rx="3" fill="#20608C" opacity="0.85"/>
+  <rect x="62" y="155" width="152" height="14" rx="3.5" fill="#2872A0" opacity="0.90"/>
+  <rect x="56" y="138" width="164" height="16" rx="4" fill="#3888B8" opacity="0.93"/>
+  <rect x="50" y="119" width="176" height="18" rx="4" fill="#5898C0" opacity="0.96"/>
+
+  <!-- Top document (teal-accented, tilted, lifting off the stack) -->
+  <g transform="translate(138, 100) rotate(-12) translate(-138, -100)">
+    <rect x="62" y="38" width="140" height="100" rx="7" fill="#FFFFFF" stroke="#1E5C8A" stroke-width="4.5"/>
+    <!-- Teal accent bar at top of document -->
+    <rect x="65" y="41" width="134" height="7" rx="2.5" fill="#30B8B0"/>
+    <!-- Content lines on document -->
+    <line x1="78" y1="62" x2="186" y2="62" stroke="#C8DDE8" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="78" y1="76" x2="176" y2="76" stroke="#C8DDE8" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="78" y1="90" x2="164" y2="90" stroke="#C8DDE8" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="78" y1="104" x2="174" y2="104" stroke="#C8DDE8" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Motion / speed lines (left side) -->
+  <line x1="24" y1="80" x2="50" y2="80" stroke="#1E5C8A" stroke-width="3" stroke-linecap="round" opacity="0.70"/>
+  <line x1="14" y1="94" x2="46" y2="94" stroke="#1E5C8A" stroke-width="2.5" stroke-linecap="round" opacity="0.50"/>
+  <line x1="20" y1="108" x2="44" y2="108" stroke="#1E5C8A" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
+</svg>

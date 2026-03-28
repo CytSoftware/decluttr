@@ -1,6 +1,16 @@
 <p align="center">
-  <h1 align="center">Decluttr</h1>
-  <p align="center">Tinder-style tab management. Swipe left to close, right to keep.<br/>Clean up 50 tabs in 60 seconds.</p>
+  <img src="docs/logo.png" alt="Decluttr" width="200" />
+</p>
+
+<p align="center">
+  <strong>Tinder-style tab management. Swipe left to close, right to keep.</strong><br/>
+  Clean up 50 tabs in 60 seconds.
+</p>
+
+<p align="center">
+  <a href="https://getdecluttr.app">Website</a> &middot;
+  <a href="PRIVACY.md">Privacy</a> &middot;
+  <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
 <p align="center">
@@ -12,12 +22,6 @@
 </p>
 
 ---
-
-<!-- TODO: Replace with actual demo GIF
-<p align="center">
-  <img src="docs/demo.gif" alt="Decluttr demo" width="400" />
-</p>
--->
 
 ## What is Decluttr?
 
@@ -136,7 +140,13 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
 
 Decluttr runs entirely in your browser. We never collect, transmit, or store your tab data. No analytics, no tracking, no servers. Your tabs are your business.
 
-The `<all_urls>` permission is required solely to read tab metadata (titles, URLs, favicons) across all your open tabs. The source code is fully auditable.
+The `<all_urls>` permission is required solely to read tab metadata (titles, URLs, favicons) across all your open tabs. The source code is fully auditable. Read the full [Privacy Policy](PRIVACY.md).
+
+## Links
+
+- **Website**: [getdecluttr.app](https://getdecluttr.app)
+- **Support**: [support@getdecluttr.app](mailto:support@getdecluttr.app)
+- **Issues**: [GitHub Issues](https://github.com/CytSoftware/decluttr/issues)
 
 ## License
 

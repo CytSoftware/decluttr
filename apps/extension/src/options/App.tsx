@@ -45,9 +45,12 @@ export function App() {
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-xl mx-auto space-y-8">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">
-            Decluttr Settings
-          </h1>
+          <div className="flex items-center gap-2.5">
+            <img src="/icons/icon-48.png" alt="" className="w-7 h-7" />
+            <h1 className="text-2xl font-bold text-text-primary">
+              Decluttr Settings
+            </h1>
+          </div>
           <p className="text-text-secondary text-sm mt-1">
             Changes take effect on your next decluttering session.
           </p>

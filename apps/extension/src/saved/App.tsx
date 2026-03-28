@@ -72,7 +72,10 @@ export function App() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">Saved Tabs</h1>
+            <div className="flex items-center gap-2.5">
+              <img src="/icons/icon-48.png" alt="" className="w-7 h-7" />
+              <h1 className="text-2xl font-bold text-text-primary">Saved Tabs</h1>
+            </div>
             <p className="text-sm text-text-secondary mt-0.5">
               {tabs.length} tab{tabs.length !== 1 ? "s" : ""} saved for later
             </p>

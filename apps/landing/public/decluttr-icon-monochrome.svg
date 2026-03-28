@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Monochrome version — uses currentColor for single-color contexts -->
+
+  <!-- Paper stack -->
+  <rect x="74" y="183" width="128" height="10" rx="3" fill="currentColor" opacity="0.38"/>
+  <rect x="68" y="170" width="140" height="12" rx="3" fill="currentColor" opacity="0.48"/>
+  <rect x="62" y="155" width="152" height="14" rx="3.5" fill="currentColor" opacity="0.58"/>
+  <rect x="56" y="138" width="164" height="16" rx="4" fill="currentColor" opacity="0.68"/>
+  <rect x="50" y="119" width="176" height="18" rx="4" fill="currentColor" opacity="0.82"/>
+
+  <!-- Top document -->
+  <g transform="translate(138, 100) rotate(-12) translate(-138, -100)">
+    <rect x="62" y="38" width="140" height="100" rx="7" fill="none" stroke="currentColor" stroke-width="4.5"/>
+    <rect x="65" y="41" width="134" height="7" rx="2.5" fill="currentColor" opacity="0.55"/>
+    <line x1="78" y1="62" x2="186" y2="62" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+    <line x1="78" y1="76" x2="176" y2="76" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+    <line x1="78" y1="90" x2="164" y2="90" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+    <line x1="78" y1="104" x2="174" y2="104" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+  </g>
+
+  <!-- Motion lines -->
+  <line x1="24" y1="80" x2="50" y2="80" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.60"/>
+  <line x1="14" y1="94" x2="46" y2="94" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.40"/>
+  <line x1="20" y1="108" x2="44" y2="108" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
+</svg>

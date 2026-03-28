@@ -8,6 +8,12 @@
 </p>
 
 <p align="center">
+  <a href="https://getdecluttr.app">Website</a> &middot;
+  <a href="PRIVACY.md">Privacy</a> &middot;
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+
+<p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/version-0.1.0-green.svg" alt="Version 0.1.0" />
   <img src="https://img.shields.io/badge/chrome-MV3-yellow.svg" alt="Chrome MV3" />
@@ -134,7 +140,13 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a pull request.
 
 Decluttr runs entirely in your browser. We never collect, transmit, or store your tab data. No analytics, no tracking, no servers. Your tabs are your business.
 
-The `<all_urls>` permission is required solely to read tab metadata (titles, URLs, favicons) across all your open tabs. The source code is fully auditable.
+The `<all_urls>` permission is required solely to read tab metadata (titles, URLs, favicons) across all your open tabs. The source code is fully auditable. Read the full [Privacy Policy](PRIVACY.md).
+
+## Links
+
+- **Website**: [getdecluttr.app](https://getdecluttr.app)
+- **Support**: [support@getdecluttr.app](mailto:support@getdecluttr.app)
+- **Issues**: [GitHub Issues](https://github.com/CytSoftware/decluttr/issues)
 
 ## License
 

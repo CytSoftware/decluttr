@@ -2,14 +2,22 @@
   "name": "Decluttr",
   "version": "0.1.0",
   "description": "Tinder-style tab management. Swipe to declutter your browser.",
-
   "{{chrome}}.manifest_version": 3,
   "{{firefox}}.manifest_version": 2,
-
-  "{{chrome}}.permissions": ["tabs", "activeTab", "storage"],
-  "{{chrome}}.host_permissions": ["<all_urls>"],
-  "{{firefox}}.permissions": ["tabs", "activeTab", "storage", "<all_urls>"],
-
+  "{{chrome}}.permissions": [
+    "tabs",
+    "activeTab",
+    "storage"
+  ],
+  "{{chrome}}.host_permissions": [
+    "<all_urls>"
+  ],
+  "{{firefox}}.permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "<all_urls>"
+  ],
   "{{chrome}}.action": {
     "default_icon": {
       "16": "icons/icon-16.png",
@@ -28,19 +36,18 @@
     "default_title": "Decluttr — Swipe to declutter",
     "default_popup": "src/popup/index.html"
   },
-
   "{{chrome}}.background": {
     "service_worker": "src/background/index.ts"
   },
   "{{firefox}}.background": {
-    "scripts": ["src/background/index.ts"]
+    "scripts": [
+      "src/background/index.ts"
+    ]
   },
-
   "options_ui": {
     "page": "src/options/index.html",
     "open_in_tab": true
   },
-
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -49,13 +56,16 @@
     "96": "icons/icon-96.png",
     "128": "icons/icon-128.png"
   },
-
   "{{firefox}}.browser_specific_settings": {
     "gecko": {
       "id": "decluttr@getdecluttr.app",
       "data_collection_permissions": {
-        "required": ["none"],
-        "optional": ["technicalAndInteraction"]
+        "required": [
+          "none"
+        ],
+        "optional": [
+          "technicalAndInteraction"
+        ]
       }
     }
   }

@@ -5,15 +5,22 @@ const config: Partial<Config> = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#3B82F6",
-          dark: "#2563EB",
+          DEFAULT: "#30B8B0",
+          dark: "#28A09A",
+        },
+        navy: {
+          DEFAULT: "#1E5C8A",
+          dark: "#174A6E",
         },
         keep: "#10B981",
         close: "#F43F5E",
         surface: "#FFFFFF",
-        background: "#FAFBFC",
-        border: "#E5E7EB",
-        "text-primary": "#111827",
+        background: "#EDF4F8",
+        border: "#C8DDE8",
+        steel: "#5898C0",
+        ocean: "#2872A0",
+        sky: "#C8DDE8",
+        "text-primary": "#1A2A3A",
         "text-secondary": "#6B7280",
         "text-muted": "#9CA3AF",
       },

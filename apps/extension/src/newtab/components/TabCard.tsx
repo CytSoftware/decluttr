@@ -29,7 +29,7 @@ export function TabCard({ tab }: TabCardProps) {
   const accent = domainAccent(tab.domain);
 
   return (
-    <div className="w-[380px] bg-surface rounded-card shadow-card overflow-hidden select-none touch-none">
+    <div className="w-[380px] bg-surface rounded-card shadow-card overflow-hidden select-none">
       {/* Domain hero area */}
       <div
         className="h-[160px] flex flex-col items-center justify-center gap-3 relative"

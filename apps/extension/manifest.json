@@ -1,6 +1,6 @@
 {
   "name": "Decluttr",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tinder-style tab management. Swipe to declutter your browser.",
   "{{chrome}}.manifest_version": 3,
   "{{firefox}}.manifest_version": 2,

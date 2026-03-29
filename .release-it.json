@@ -12,7 +12,8 @@
     ]
   },
   "npm": {
-    "publish": false
+    "publish": false,
+    "ignoreVersion": true
   },
   "hooks": {
     "before:bump": "node scripts/sync-versions.js ${version}",

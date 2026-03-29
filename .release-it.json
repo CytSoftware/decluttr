@@ -11,10 +11,7 @@
       "apps/extension/decluttr-firefox.zip"
     ]
   },
-  "npm": {
-    "publish": false,
-    "ignoreVersion": true
-  },
+  "npm": false,
   "hooks": {
     "before:bump": "node scripts/sync-versions.js ${version}",
     "after:bump": "pnpm --filter @decluttr/extension package:all"

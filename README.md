@@ -9,15 +9,17 @@
 
 <p align="center">
   <a href="https://getdecluttr.app">Website</a> &middot;
+  <a href="https://chromewebstore.google.com/detail/decluttr/bnkhofimcmllfncihhhglmebplpjikaj">Chrome</a> &middot;
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/decluttr/">Firefox</a> &middot;
   <a href="PRIVACY.md">Privacy</a> &middot;
   <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" /></a>
-  <img src="https://img.shields.io/badge/version-0.1.0-green.svg" alt="Version 0.1.0" />
-  <img src="https://img.shields.io/badge/chrome-MV3-yellow.svg" alt="Chrome MV3" />
-  <img src="https://img.shields.io/badge/firefox-MV2-orange.svg" alt="Firefox MV2" />
+  <img src="https://img.shields.io/badge/version-0.2.1-green.svg" alt="Version 0.2.1" />
+  <a href="https://chromewebstore.google.com/detail/decluttr/bnkhofimcmllfncihhhglmebplpjikaj"><img src="https://img.shields.io/badge/chrome-web%20store-4285F4.svg?logo=googlechrome&logoColor=white" alt="Chrome Web Store" /></a>
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/decluttr/"><img src="https://img.shields.io/badge/firefox-add--ons-FF7139.svg?logo=firefox&logoColor=white" alt="Firefox Add-ons" /></a>
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" />
 </p>
 
@@ -44,13 +46,11 @@ Built for knowledge workers who chronically accumulate 30-100+ tabs across proje
 
 ## Install
 
-### From the stores (coming soon)
-
-<!-- TODO: Replace with actual store URLs once approved -->
+### From the stores
 
 | Chrome Web Store | Firefox Add-ons |
 |---|---|
-| Coming soon | Coming soon |
+| [Add to Chrome](https://chromewebstore.google.com/detail/decluttr/bnkhofimcmllfncihhhglmebplpjikaj) | [Add to Firefox](https://addons.mozilla.org/en-US/firefox/addon/decluttr/) |
 
 ### From source
 
@@ -145,6 +145,8 @@ The `<all_urls>` permission is required solely to read tab metadata (titles, URL
 ## Links
 
 - **Website**: [getdecluttr.app](https://getdecluttr.app)
+- **Chrome Web Store**: [Add to Chrome](https://chromewebstore.google.com/detail/decluttr/bnkhofimcmllfncihhhglmebplpjikaj)
+- **Firefox Add-ons**: [Add to Firefox](https://addons.mozilla.org/en-US/firefox/addon/decluttr/)
 - **Support**: [support@getdecluttr.app](mailto:support@getdecluttr.app)
 - **Issues**: [GitHub Issues](https://github.com/CytSoftware/decluttr/issues)
 

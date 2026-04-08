@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import TinderCard from "react-tinder-card";
+import { CHROME_STORE_URL, FIREFOX_STORE_URL } from "../constants";
 
 interface MockTab {
   id: number;
@@ -152,18 +153,32 @@ export function Hero() {
           Swipe left to close. Swipe right to keep. That&apos;s it. A
           Tinder-style UI for managing your open tabs across all windows.
         </p>
-        <div className="flex items-center justify-center gap-4 pt-2">
-          <a
-            href="#install"
-            className="px-6 py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary-dark transition-colors shadow-md"
-          >
-            Install Free
-          </a>
+        <div className="flex flex-col items-center gap-4 pt-2">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <a
+              href={CHROME_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-text-primary text-white font-medium hover:bg-gray-800 transition-colors shadow-md"
+            >
+              <img src="/icons8-chrome-48.png" alt="" width="20" height="20" />
+              Add to Chrome
+            </a>
+            <a
+              href={FIREFOX_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FF7139] text-white font-medium hover:bg-[#e5652f] transition-colors shadow-md"
+            >
+              <img src="/firefox.png" alt="" width="20" height="20" className="rounded-full" />
+              Add to Firefox
+            </a>
+          </div>
           <a
             href="#how-it-works"
-            className="px-6 py-3 rounded-xl bg-gray-100 text-text-primary font-medium hover:bg-gray-200 transition-colors"
+            className="text-sm text-text-secondary hover:text-text-primary transition-colors"
           >
-            See how it works
+            See how it works &darr;
           </a>
         </div>
 

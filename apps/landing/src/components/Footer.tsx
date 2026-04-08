@@ -1,4 +1,10 @@
-import { GITHUB_REPO_URL, SUPPORT_EMAIL, PRIVACY_URL } from "../constants";
+import {
+  GITHUB_REPO_URL,
+  SUPPORT_EMAIL,
+  PRIVACY_URL,
+  CHROME_STORE_URL,
+  FIREFOX_STORE_URL,
+} from "../constants";
 
 export function Footer() {
   return (
@@ -7,7 +13,23 @@ export function Footer() {
         <span>
           &copy; {new Date().getFullYear()} CytSoftware. All rights reserved.
         </span>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap justify-center">
+          <a
+            href={CHROME_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-text-secondary transition-colors"
+          >
+            Chrome
+          </a>
+          <a
+            href={FIREFOX_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-text-secondary transition-colors"
+          >
+            Firefox
+          </a>
           <a
             href={GITHUB_REPO_URL}
             target="_blank"

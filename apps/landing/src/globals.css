@@ -1,9 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  @apply bg-background text-text-primary antialiased;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  @apply bg-white text-gray-900 antialiased;
+  overflow-x: hidden;
 }
 
 @keyframes wobble {

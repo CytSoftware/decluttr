@@ -1,75 +1,81 @@
-const features = [
-  {
-    title: "Swipe to decide",
-    description:
-      "Intuitive Tinder-style card interface. Swipe left to close, right to keep. Use keyboard shortcuts for even faster decisions.",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="4" width="20" height="16" rx="2" />
-        <path d="M7 15l3-3-3-3" />
-        <path d="M17 15l-3-3 3-3" />
-      </svg>
-    ),
-  },
-  {
-    title: "Smart duplicates",
-    description:
-      "Automatically detects duplicate tabs and groups them together. Keep one, close the rest in a single swipe.",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="4" y="4" width="16" height="16" rx="2" />
-        <rect x="8" y="2" width="14" height="14" rx="2" />
-      </svg>
-    ),
-  },
-  {
-    title: "All windows, one deck",
-    description:
-      "Pulls tabs from every open browser window into a single swipe deck. Stale tabs surface first so you can clean up fast.",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="3" width="20" height="14" rx="2" />
-        <path d="M8 21h8" />
-        <path d="M12 17v4" />
-      </svg>
-    ),
-  },
-  {
-    title: "Safe by default",
-    description:
-      "Nothing is closed until you confirm. Review your choices on the summary screen. Rescue any tab with one click.",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      </svg>
-    ),
-  },
-];
-
 export function Features() {
   return (
-    <section className="py-20 px-6 bg-gray-50/50">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
-          Features
+    <section className="py-28 px-6 bg-[#30B8B0]">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-white text-center mb-14">
+          What's inside
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="bg-surface rounded-xl p-6 border border-border space-y-3"
-            >
-              <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
-                {feature.icon}
-              </div>
-              <h3 className="text-base font-semibold text-text-primary">
-                {feature.title}
-              </h3>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                {feature.description}
+
+        {/* Bento grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Large card */}
+          <div className="sm:col-span-2 bg-white rounded-2xl p-7">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Every window, one deck</h3>
+            <p className="text-gray-500 leading-relaxed">
+              Tabs from all your browser windows get merged into a single swipe session. Each card tells you which window it's from so you never lose context. No more switching between windows trying to figure out what's where.
+            </p>
+          </div>
+
+          {/* Tall card — keyboard shortcuts */}
+          <div className="row-span-2 bg-white rounded-2xl p-7 flex flex-col justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Keyboard-first</h3>
+              <p className="text-gray-500 leading-relaxed mb-6">
+                Blaze through your tabs without touching the mouse.
               </p>
             </div>
-          ))}
+            <div className="flex flex-col gap-2.5">
+              {[
+                { keys: "← →", label: "Close / Keep" },
+                { keys: "↑", label: "Save for later" },
+                { keys: "U", label: "Undo last" },
+                { keys: "⌘Z", label: "Undo last" },
+              ].map((k) => (
+                <div key={k.keys} className="flex items-center gap-3">
+                  <kbd className="px-2.5 py-1 bg-[#30B8B0]/10 rounded-lg text-sm font-mono text-[#1E8A84] font-semibold border border-[#30B8B0]/15 min-w-[48px] text-center">
+                    {k.keys}
+                  </kbd>
+                  <span className="text-sm text-gray-400">{k.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-7">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Stale tabs first</h3>
+            <p className="text-gray-500 leading-relaxed">
+              Sorts by last accessed. The tabs you forgot about weeks ago show up first — easy to close.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-7">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Duplicate detection</h3>
+            <p className="text-gray-500 leading-relaxed">
+              Finds tabs pointing to the same URL and flags them. Keep one, close the rest.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-7">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Undo any swipe</h3>
+            <p className="text-gray-500 leading-relaxed">
+              Swiped too fast? Bring the last card back instantly. Full undo stack until you confirm.
+            </p>
+          </div>
+
+          {/* Wide card */}
+          <div className="sm:col-span-2 bg-white rounded-2xl p-7">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Save for later</h3>
+            <p className="text-gray-500 leading-relaxed">
+              Not ready to close it but don't need it open? Swipe up. Saved tabs are stored locally in your browser and grouped by domain. Reopen them anytime.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-7">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Session summary</h3>
+            <p className="text-gray-500 leading-relaxed">
+              After swiping, see exactly what you closed, kept, and saved. Rescue any tab before confirming.
+            </p>
+          </div>
         </div>
       </div>
     </section>

@@ -1,98 +1,60 @@
 const steps = [
   {
     number: "1",
-    title: "Click the icon",
-    description: "Hit the Decluttr icon in your toolbar to start a session.",
-    icon: (
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="text-primary"
-      >
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <path d="M15 3v18" />
-        <path d="M9 15l3-3 3 3" />
-      </svg>
-    ),
+    title: "Click the toolbar icon",
+    description: "Decluttr collects every open tab across all your browser windows into a single deck. Pinned tabs and browser pages are automatically skipped.",
+    align: "left" as const,
   },
   {
     number: "2",
-    title: "Swipe through tabs",
-    description:
-      "Swipe left to close, right to keep. Use keyboard shortcuts for speed.",
-    icon: (
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="text-primary"
-      >
-        <path d="M5 12h14" />
-        <path d="M12 5l7 7-7 7" />
-      </svg>
-    ),
+    title: "Swipe through the deck",
+    description: "Left to close, right to keep, up to save for later. Use keyboard arrows for speed. The stalest tabs surface first so the easy calls come first.",
+    align: "right" as const,
   },
   {
     number: "3",
-    title: "Confirm & done",
-    description:
-      "Review your choices, rescue any tabs you changed your mind about, and confirm.",
-    icon: (
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="text-primary"
-      >
-        <path d="M20 6L9 17l-5-5" />
-      </svg>
-    ),
+    title: "Review and confirm",
+    description: "A summary shows everything you're about to close vs. keep. Changed your mind? Rescue any tab with one click. Nothing closes until you say so.",
+    align: "left" as const,
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-20 px-6">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-text-primary text-center mb-12">
+    <section id="how-it-works" className="py-28 px-6">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-20">
           How it works
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              className="text-center space-y-3"
-            >
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/5 flex items-center justify-center">
-                {step.icon}
+
+        <div className="relative">
+          {/* Vertical line */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#30B8B0]/20 hidden md:block" />
+
+          <div className="space-y-16 md:space-y-20">
+            {steps.map((step) => (
+              <div key={step.number} className={`md:flex items-center gap-12 ${step.align === "right" ? "md:flex-row-reverse" : ""}`}>
+                {/* Content side */}
+                <div className={`flex-1 ${step.align === "right" ? "md:text-left" : "md:text-right"}`}>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
+                  <p className="text-[15px] text-gray-500 leading-relaxed">{step.description}</p>
+                </div>
+
+                {/* Center circle */}
+                <div className="hidden md:flex w-14 h-14 rounded-full bg-[#30B8B0] text-white items-center justify-center font-extrabold text-lg flex-shrink-0 shadow-lg shadow-[#30B8B0]/30 relative z-10">
+                  {step.number}
+                </div>
+
+                {/* Spacer for the other side */}
+                <div className="flex-1 hidden md:block" />
+
+                {/* Mobile number */}
+                <div className="md:hidden w-10 h-10 rounded-full bg-[#30B8B0] text-white flex items-center justify-center font-bold text-sm mb-3 mt-6">
+                  {step.number}
+                </div>
               </div>
-              <div className="text-xs font-bold text-primary uppercase tracking-wider">
-                Step {step.number}
-              </div>
-              <h3 className="text-lg font-semibold text-text-primary">
-                {step.title}
-              </h3>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                {step.description}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

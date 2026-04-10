@@ -26,7 +26,7 @@ export function Comparison() {
                   </svg>
                 </div>
                 <div>
-                  <div className="font-bold text-gray-900 text-sm">{o.name} <span className="font-normal text-gray-400">— {o.example}</span></div>
+                  <div className="font-bold text-gray-900 text-sm">{o.name} <span className="font-normal text-gray-400">/ {o.example}</span></div>
                   <p className="text-sm text-gray-500 mt-1">{o.issue}</p>
                 </div>
               </div>
@@ -43,7 +43,7 @@ export function Comparison() {
               You make the call on every tab, one at a time. Fast enough to not feel like work, safe enough to never lose anything.
             </p>
             <div className="space-y-2.5 text-sm">
-              {["Swipe to decide — no lists or menus", "Undo and rescue before anything closes", "Works across all windows at once", "No setup, no accounts, no config"].map((line) => (
+              {["Swipe to decide, no lists or menus", "Undo and rescue before anything closes", "Works across all windows at once", "No setup, no accounts, no config"].map((line) => (
                 <div key={line} className="flex items-start gap-2">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="mt-0.5 flex-shrink-0">
                     <polyline points="20 6 9 17 4 12" />

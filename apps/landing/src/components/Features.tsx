@@ -16,7 +16,7 @@ export function Features() {
             </p>
           </div>
 
-          {/* Tall card — keyboard shortcuts */}
+          {/* Tall card - keyboard shortcuts */}
           <div className="row-span-2 bg-white rounded-2xl p-7 flex flex-col justify-between">
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Keyboard-first</h3>
@@ -44,7 +44,7 @@ export function Features() {
           <div className="bg-white rounded-2xl p-7">
             <h3 className="text-lg font-bold text-gray-900 mb-2">Stale tabs first</h3>
             <p className="text-gray-500 leading-relaxed">
-              Sorts by last accessed. The tabs you forgot about weeks ago show up first — easy to close.
+              Sorts by last accessed. The tabs you forgot about weeks ago show up first. Easy to close.
             </p>
           </div>
 

@@ -5,7 +5,7 @@ export function OpenSource({ stars }: { stars: number | null }) {
     <section className="py-28 px-6 bg-gray-50">
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left — big statement */}
+          {/* Left - big statement */}
           <div>
             <div className="inline-block px-3 py-1 rounded-full bg-[#30B8B0]/10 text-[#30B8B0] text-xs font-semibold mb-4 tracking-wide uppercase">
               Open source
@@ -41,7 +41,7 @@ export function OpenSource({ stars }: { stars: number | null }) {
             </div>
           </div>
 
-          {/* Right — checklist card */}
+          {/* Right - checklist card */}
           <div className="bg-white rounded-2xl p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)] border border-gray-100">
             <h3 className="font-bold text-gray-900 mb-6 text-lg">The privacy checklist</h3>
             {[
@@ -50,7 +50,7 @@ export function OpenSource({ stars }: { stars: number | null }) {
               "No accounts or sign-up",
               "No analytics or telemetry",
               "All storage is local to your browser",
-              "MIT license — do whatever you want",
+              "MIT license, do whatever you want",
             ].map((item) => (
               <div key={item} className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0">
                 <div className="w-6 h-6 rounded-full bg-[#30B8B0]/10 flex items-center justify-center flex-shrink-0">

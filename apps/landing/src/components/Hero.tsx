@@ -15,10 +15,10 @@ interface MockTab {
 
 const MOCK_TABS: MockTab[] = [
   { id: 1, title: "How to center a div in CSS", domain: "stackoverflow.com", path: "/questions/356809", age: "3 weeks ago", color: "#F48024", accentBg: "hsl(27, 45%, 92%)", action: "left" },
-  { id: 2, title: "React 19 — What's New", domain: "react.dev", path: "/blog/react-19", age: "2 days ago", color: "#61DAFB", accentBg: "hsl(193, 45%, 92%)", action: "right" },
+  { id: 2, title: "React 19: What's New", domain: "react.dev", path: "/blog/react-19", age: "2 days ago", color: "#61DAFB", accentBg: "hsl(193, 45%, 92%)", action: "right" },
   { id: 3, title: "Best pizza places nearby", domain: "google.com", path: "/search?q=best+pizza", age: "1 month ago", color: "#4285F4", accentBg: "hsl(217, 45%, 92%)", action: "left" },
   { id: 4, title: "Tailwind CSS Documentation", domain: "tailwindcss.com", path: "/docs/installation", age: "5 min ago", color: "#06B6D4", accentBg: "hsl(185, 45%, 92%)", action: "right" },
-  { id: 5, title: "GitHub — CytSoftware/decluttr", domain: "github.com", path: "/CytSoftware/decluttr", age: "Just now", color: "#333333", accentBg: "hsl(0, 0%, 93%)", action: "right" },
+  { id: 5, title: "GitHub: CytSoftware/decluttr", domain: "github.com", path: "/CytSoftware/decluttr", age: "Just now", color: "#333333", accentBg: "hsl(0, 0%, 93%)", action: "right" },
 ];
 
 type CardRef = { swipe: (dir: string) => Promise<void> };

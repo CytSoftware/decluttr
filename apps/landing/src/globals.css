@@ -1,9 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  @apply bg-background text-text-primary antialiased;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  @apply bg-white text-gray-900 antialiased;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 @keyframes wobble {
@@ -14,4 +22,9 @@ body {
 
 .animate-wobble {
   animation: wobble 0.8s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

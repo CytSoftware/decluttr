@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { GITHUB_REPO_URL } from "../constants";
 
-const NAV_LINKS = [
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#features", label: "Features" },
-  { href: "#faq", label: "FAQ" },
+const SECTION_LINKS = [
+  { hash: "#how-it-works", label: "How it works" },
+  { hash: "#features", label: "Features" },
+  { hash: "#faq", label: "FAQ" },
 ];
 
 export function Navbar({ stars }: { stars: number | null }) {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const isLanding = location.pathname === "/";
 
   useEffect(() => {
     if (!open) return;
@@ -23,22 +26,38 @@ export function Navbar({ stars }: { stars: number | null }) {
     };
   }, [open]);
 
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
   const close = () => setOpen(false);
+
+  const sectionLinkProps = (hash: string) =>
+    isLanding
+      ? { href: hash }
+      : { href: `/${hash}` };
 
   return (
     <nav aria-label="Primary" className="fixed top-0 left-0 right-0 bg-white/85 backdrop-blur-lg border-b border-[#30B8B0]/10 z-50">
       <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between gap-6">
-        <a href="/" className="flex items-center gap-2 shrink-0">
+        <Link to="/" className="flex items-center gap-2 shrink-0">
           <img src="/decluttr-icon-only.svg" alt="" className="h-7" />
           <img src="/decluttr-wordmark.svg" alt="Decluttr" className="h-4 hidden sm:block" />
-        </a>
+        </Link>
 
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-          {NAV_LINKS.map((link) => (
-            <a key={link.href} href={link.href} className="hover:text-gray-900 transition-colors">
+          {SECTION_LINKS.map((link) => (
+            <a
+              key={link.hash}
+              {...sectionLinkProps(link.hash)}
+              className="hover:text-gray-900 transition-colors"
+            >
               {link.label}
             </a>
           ))}
+          <Link to="/blog" className="hover:text-gray-900 transition-colors">
+            Blog
+          </Link>
         </div>
 
         <div className="hidden md:flex items-center gap-3">
@@ -66,7 +85,7 @@ export function Navbar({ stars }: { stars: number | null }) {
             </span>
           </a>
           <a
-            href="#install"
+            {...sectionLinkProps("#install")}
             className="px-4 py-1.5 rounded-lg bg-[#30B8B0] text-white text-sm font-semibold hover:bg-[#28A09A] transition-colors"
           >
             Install
@@ -95,16 +114,23 @@ export function Navbar({ stars }: { stars: number | null }) {
           className="md:hidden absolute top-14 inset-x-0 bg-white border-b border-gray-100 shadow-lg"
         >
           <div className="px-6 py-6 flex flex-col gap-1">
-            {NAV_LINKS.map((link) => (
+            {SECTION_LINKS.map((link) => (
               <a
-                key={link.href}
-                href={link.href}
+                key={link.hash}
+                {...sectionLinkProps(link.hash)}
                 onClick={close}
                 className="px-2 py-3 text-base font-medium text-gray-700 hover:text-gray-900 border-b border-gray-100 last:border-0"
               >
                 {link.label}
               </a>
             ))}
+            <Link
+              to="/blog"
+              onClick={close}
+              className="px-2 py-3 text-base font-medium text-gray-700 hover:text-gray-900 border-b border-gray-100 last:border-0"
+            >
+              Blog
+            </Link>
             <div className="flex items-center gap-3 pt-4 mt-2 border-t border-gray-100">
               <a
                 href={GITHUB_REPO_URL}
@@ -128,7 +154,7 @@ export function Navbar({ stars }: { stars: number | null }) {
                 </span>
               </a>
               <a
-                href="#install"
+                {...sectionLinkProps("#install")}
                 onClick={close}
                 className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-[#30B8B0] text-white text-sm font-semibold hover:bg-[#28A09A]"
               >

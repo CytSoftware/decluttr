@@ -1,3 +1,4 @@
+import { Link, useLocation } from "react-router-dom";
 import {
   GITHUB_REPO_URL,
   SUPPORT_EMAIL,
@@ -7,6 +8,9 @@ import {
 } from "../constants";
 
 export function Footer() {
+  const location = useLocation();
+  const faqHref = location.pathname === "/" ? "#faq" : "/#faq";
+
   return (
     <footer role="contentinfo" className="bg-[#1A2A3A] py-10 px-6">
       <div className="max-w-5xl mx-auto flex flex-col items-center gap-4 text-sm text-gray-400">
@@ -22,7 +26,8 @@ export function Footer() {
             <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Chrome</a>
             <a href={FIREFOX_STORE_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Firefox</a>
             <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
-            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+            <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
+            <a href={faqHref} className="hover:text-white transition-colors">FAQ</a>
             <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Privacy</a>
             <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-white transition-colors">{SUPPORT_EMAIL}</a>
           </nav>

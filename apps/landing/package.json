@@ -11,6 +11,8 @@
     "@decluttr/ui": "workspace:*",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "react-helmet-async": "^3.0.0",
+    "react-router-dom": "^7.14.0",
     "react-tinder-card": "^1.6.4"
   },
   "devDependencies": {

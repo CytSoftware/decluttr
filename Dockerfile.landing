@@ -18,6 +18,16 @@ FROM node:20-alpine AS builder
 RUN corepack enable
 WORKDIR /app
 
+# Ghost CMS — baked into the Vite bundle at build time.
+# The Content API key is read-only and safe to ship client-side.
+# If unset, blog pages render a graceful empty state.
+ARG VITE_GHOST_URL
+ARG VITE_GHOST_CONTENT_API_KEY
+ARG VITE_GHOST_TAG
+ENV VITE_GHOST_URL=$VITE_GHOST_URL
+ENV VITE_GHOST_CONTENT_API_KEY=$VITE_GHOST_CONTENT_API_KEY
+ENV VITE_GHOST_TAG=$VITE_GHOST_TAG
+
 COPY --from=deps /app ./
 COPY . .
 

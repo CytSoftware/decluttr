@@ -6,13 +6,13 @@ const others = [
 
 export function Comparison() {
   return (
-    <section className="py-28 px-6">
+    <section aria-labelledby="comparison-heading" className="py-28 px-6">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-4">
+        <h2 id="comparison-heading" className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-4 tracking-tight">
           Not another tab manager
         </h2>
-        <p className="text-gray-500 text-center max-w-xl mx-auto mb-16">
-          Most tools organize, save, or auto-close your tabs. Decluttr helps you make fast, intentional decisions about each one.
+        <p className="text-gray-500 text-center max-w-xl mx-auto mb-16 text-lg">
+          Most tools hide, group, or auto-kill your tabs. Decluttr makes you decide &mdash; fast.
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">

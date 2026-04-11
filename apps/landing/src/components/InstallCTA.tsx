@@ -10,12 +10,12 @@ export function InstallCTA() {
           <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-[#30B8B0]/15 blur-3xl" />
 
           <div className="relative">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 tracking-tight">
               Your tabs aren't going
-              <br />to close themselves
+              <br />to close themselves.
             </h2>
             <p className="text-lg text-gray-400 mb-8">
-              Install Decluttr and start swiping.
+              Free. Open source. No account. Install in ten seconds.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <a

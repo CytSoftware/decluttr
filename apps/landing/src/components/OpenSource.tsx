@@ -2,7 +2,7 @@ import { GITHUB_REPO_URL, PRIVACY_URL } from "../constants";
 
 export function OpenSource({ stars }: { stars: number | null }) {
   return (
-    <section className="py-28 px-6 bg-gray-50">
+    <section aria-labelledby="opensource-heading" className="py-28 px-6 bg-gray-50">
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left - big statement */}
@@ -10,15 +10,15 @@ export function OpenSource({ stars }: { stars: number | null }) {
             <div className="inline-block px-3 py-1 rounded-full bg-[#30B8B0]/10 text-[#30B8B0] text-xs font-semibold mb-4 tracking-wide uppercase">
               Open source
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 leading-tight">
-              Read every line.
+            <h2 id="opensource-heading" className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4 leading-tight tracking-tight">
+              MIT-licensed.
               <br />
-              Build it yourself.
+              Zero telemetry.
               <br />
-              Fork it.
+              Yours to fork.
             </h2>
-            <p className="text-gray-500 leading-relaxed mb-6 max-w-md">
-              Decluttr is MIT-licensed and runs entirely in your browser. No accounts, no servers, no analytics, no telemetry. Your tab data never leaves your machine.
+            <p className="text-gray-500 leading-relaxed mb-6 max-w-md text-lg">
+              Every line ships on GitHub. No accounts, no servers, no tracking. Audit it, build it, fork it.
             </p>
             <div className="flex items-center gap-4">
               <a

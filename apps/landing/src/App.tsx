@@ -5,6 +5,7 @@ import { HowItWorks } from "./components/HowItWorks";
 import { Features } from "./components/Features";
 import { Comparison } from "./components/Comparison";
 import { OpenSource } from "./components/OpenSource";
+import { StarCTA } from "./components/StarCTA";
 import { FAQ } from "./components/FAQ";
 import { InstallCTA } from "./components/InstallCTA";
 import { Footer } from "./components/Footer";
@@ -29,6 +30,7 @@ export function App() {
         <Features />
         <Comparison />
         <OpenSource stars={stars} />
+        <StarCTA stars={stars} />
         <FAQ />
         <InstallCTA />
       </main>

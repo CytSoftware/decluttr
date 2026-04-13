@@ -80,22 +80,22 @@ export function Hero() {
   );
 
   return (
-    <section className="relative pt-32 pb-24 px-6 bg-[#EDF4F8] overflow-hidden">
+    <section className="relative pt-20 pb-16 px-6 bg-[#EDF4F8] overflow-hidden">
       <div className="absolute top-24 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-white/60 blur-3xl opacity-50" aria-hidden="true" />
       <div className="absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full bg-[#30B8B0]/10 blur-3xl" aria-hidden="true" />
       <div className="absolute -bottom-24 -left-24 w-[420px] h-[420px] rounded-full bg-[#30B8B0]/10 blur-3xl" aria-hidden="true" />
 
       <div className="relative max-w-4xl mx-auto text-center">
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-[#1A2A3A] leading-[1.05] tracking-tight">
+        <h1 className="text-5xl sm:text-6xl lg:text-6xl font-extrabold text-[#1A2A3A] leading-[1.05] tracking-tight">
           Declutter your browser
           <br />
           <span className="text-[#30B8B0]">in seconds.</span>
         </h1>
-        <p className="mt-7 text-lg sm:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto">
+        <p className="mt-5 text-lg sm:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto">
           Swipe left to close. Swipe right to keep. That's it. A Tinder-style UI for managing your open tabs across all windows.
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
             href={CHROME_STORE_URL}
             target="_blank"
@@ -118,7 +118,7 @@ export function Hero() {
 
         <a
           href="#how-it-works"
-          className="inline-flex items-center gap-1.5 mt-7 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          className="inline-flex items-center gap-1.5 mt-5 text-sm text-gray-400 hover:text-gray-600 transition-colors"
         >
           See how it works
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -127,8 +127,8 @@ export function Hero() {
           </svg>
         </a>
 
-        <div className="mt-14 flex flex-col items-center" onPointerDown={onUserInteract}>
-          <div className="relative w-[340px] sm:w-[400px] lg:w-[440px] h-[440px] select-none">
+        <div className="mt-10 flex flex-col items-center" onPointerDown={onUserInteract}>
+          <div className="relative w-[340px] sm:w-[400px] lg:w-[440px] h-[360px] sm:h-[440px] select-none">
             {visibleTabs.map((tab, i) => {
               const ri = visibleTabs.length - 1 - i;
               const isTop = ri === 0;

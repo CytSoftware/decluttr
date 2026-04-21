@@ -16,6 +16,9 @@ interface SwipeDeckProps {
   onSwipeRight: (tab: TabCardType) => void;
   onSwipeUp: (tab: TabCardType) => void;
   onUndo: () => void;
+  onPeek: (tab: TabCardType) => void;
+  onOpen: (tab: TabCardType) => void;
+  disableInput: boolean;
 }
 
 const SWIPE_THRESHOLD = 80;
@@ -54,6 +57,9 @@ export function SwipeDeck({
   onSwipeRight,
   onSwipeUp,
   onUndo,
+  onPeek,
+  onOpen,
+  disableInput,
 }: SwipeDeckProps) {
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   const [exiting, setExiting] = useState<SwipeDir>(null);
@@ -93,12 +99,12 @@ export function SwipeDeck({
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      if (exiting) return;
+      if (exiting || disableInput) return;
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       startPos.current = { x: e.clientX, y: e.clientY };
       setDrag({ x: 0, y: 0 });
     },
-    [exiting]
+    [exiting, disableInput]
   );
 
   const onPointerMove = useCallback(
@@ -143,12 +149,24 @@ export function SwipeDeck({
     triggerSwipe("up", currentTab);
   }, [currentTab, exiting, triggerSwipe]);
 
+  const peek = useCallback(() => {
+    if (!currentTab || exiting) return;
+    onPeek(currentTab);
+  }, [currentTab, exiting, onPeek]);
+
+  const openTab = useCallback(() => {
+    if (!currentTab || exiting) return;
+    onOpen(currentTab);
+  }, [currentTab, exiting, onOpen]);
+
   useKeyboardShortcuts({
     onSwipeLeft: swipeLeft,
     onSwipeRight: swipeRight,
     onSwipeUp: swipeUp,
     onUndo,
-    enabled: currentTab !== null,
+    onPeek: peek,
+    onOpen: openTab,
+    enabled: currentTab !== null && !disableInput,
   });
 
   // Compute top card transform
@@ -208,7 +226,11 @@ export function SwipeDeck({
               onPointerMove={isTop ? onPointerMove : undefined}
               onPointerUp={isTop ? onPointerUp : undefined}
             >
-              <TabCard tab={tab} />
+              <TabCard
+                tab={tab}
+                onPeek={isTop ? onPeek : undefined}
+                onOpen={isTop ? onOpen : undefined}
+              />
 
               {/* Swipe overlays */}
               {isTop && (
@@ -264,6 +286,14 @@ export function SwipeDeck({
         <span>
           <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px]">U</kbd>{" "}
           Undo
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px]">Space</kbd>{" "}
+          Peek
+        </span>
+        <span>
+          <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px]">Enter</kbd>{" "}
+          Open
         </span>
       </div>
     </div>

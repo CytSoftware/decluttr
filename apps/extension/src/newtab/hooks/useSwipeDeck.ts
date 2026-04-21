@@ -11,6 +11,9 @@ import type {
 interface SwipeDeckState extends SessionState {
   deckState: DeckState;
   undoStack: UndoAction[];
+  previewingTab: TabCard | null;
+  pendingDecision: TabCard | null;
+  overlayTab: TabCard | null;
 }
 
 type Action =
@@ -26,7 +29,13 @@ type Action =
   | { type: "SAVE_TAB"; tab: TabCard }
   | { type: "UNDO" }
   | { type: "RESCUE_TAB"; tabId: number }
-  | { type: "TAB_REMOVED_EXTERNALLY"; tabId: number };
+  | { type: "TAB_REMOVED_EXTERNALLY"; tabId: number }
+  | { type: "SHOW_PEEK"; tab: TabCard }
+  | { type: "HIDE_PEEK" }
+  | { type: "SET_PENDING_DECISION"; tab: TabCard }
+  | { type: "CLEAR_PENDING_DECISION" }
+  | { type: "SET_OVERLAY_TAB"; tab: TabCard }
+  | { type: "CLEAR_OVERLAY_TAB" };
 
 function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
   switch (action.type) {
@@ -44,6 +53,9 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
         undoStack: [],
         startTime: Date.now(),
         deckState,
+        previewingTab: null,
+        pendingDecision: null,
+        overlayTab: null,
       };
     }
 
@@ -144,6 +156,12 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
     case "TAB_REMOVED_EXTERNALLY": {
       const newTabs = state.tabs.filter((t) => t.id !== action.tabId);
       const newIndex = Math.min(state.currentIndex, newTabs.length - 1);
+      const previewingTab =
+        state.previewingTab?.id === action.tabId ? null : state.previewingTab;
+      const pendingDecision =
+        state.pendingDecision?.id === action.tabId ? null : state.pendingDecision;
+      const overlayTab =
+        state.overlayTab?.id === action.tabId ? null : state.overlayTab;
       return {
         ...state,
         tabs: newTabs,
@@ -151,8 +169,29 @@ function reducer(state: SwipeDeckState, action: Action): SwipeDeckState {
         closedTabs: state.closedTabs.filter((t) => t.id !== action.tabId),
         keptTabs: state.keptTabs.filter((t) => t.id !== action.tabId),
         deckState: newTabs.length === 0 ? "empty" : state.deckState,
+        previewingTab,
+        pendingDecision,
+        overlayTab,
       };
     }
+
+    case "SHOW_PEEK":
+      return { ...state, previewingTab: action.tab };
+
+    case "HIDE_PEEK":
+      return { ...state, previewingTab: null };
+
+    case "SET_PENDING_DECISION":
+      return { ...state, pendingDecision: action.tab };
+
+    case "CLEAR_PENDING_DECISION":
+      return { ...state, pendingDecision: null };
+
+    case "SET_OVERLAY_TAB":
+      return { ...state, overlayTab: action.tab };
+
+    case "CLEAR_OVERLAY_TAB":
+      return { ...state, overlayTab: null };
 
     default:
       return state;
@@ -170,6 +209,9 @@ const initialState: SwipeDeckState = {
   startTime: Date.now(),
   deckState: "loading",
   undoStack: [],
+  previewingTab: null,
+  pendingDecision: null,
+  overlayTab: null,
 };
 
 export function useSwipeDeck() {
@@ -210,6 +252,30 @@ export function useSwipeDeck() {
     dispatch({ type: "SET_STATE", deckState });
   }, []);
 
+  const showPeek = useCallback((tab: TabCard) => {
+    dispatch({ type: "SHOW_PEEK", tab });
+  }, []);
+
+  const hidePeek = useCallback(() => {
+    dispatch({ type: "HIDE_PEEK" });
+  }, []);
+
+  const setPendingDecision = useCallback((tab: TabCard) => {
+    dispatch({ type: "SET_PENDING_DECISION", tab });
+  }, []);
+
+  const clearPendingDecision = useCallback(() => {
+    dispatch({ type: "CLEAR_PENDING_DECISION" });
+  }, []);
+
+  const setOverlayTab = useCallback((tab: TabCard) => {
+    dispatch({ type: "SET_OVERLAY_TAB", tab });
+  }, []);
+
+  const clearOverlayTab = useCallback(() => {
+    dispatch({ type: "CLEAR_OVERLAY_TAB" });
+  }, []);
+
   const currentTab =
     state.deckState === "swiping" && state.currentIndex < state.tabs.length
       ? state.tabs[state.currentIndex]
@@ -234,5 +300,11 @@ export function useSwipeDeck() {
     rescueTab,
     tabRemovedExternally,
     setDeckState,
+    showPeek,
+    hidePeek,
+    setPendingDecision,
+    clearPendingDecision,
+    setOverlayTab,
+    clearOverlayTab,
   };
 }

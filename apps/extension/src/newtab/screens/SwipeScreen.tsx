@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill";
 import type { TabCard as TabCardType } from "@decluttr/types";
 import { SwipeDeck } from "../components/SwipeDeck";
+import { PendingDecisionPanel } from "../components/PendingDecisionPanel";
 
 interface SwipeScreenProps {
   tabs: TabCardType[];
@@ -12,6 +13,14 @@ interface SwipeScreenProps {
   onSwipeRight: (tab: TabCardType) => void;
   onSwipeUp: (tab: TabCardType) => void;
   onUndo: () => void;
+  onPeek: (tab: TabCardType) => void;
+  onOpen: (tab: TabCardType) => void;
+  disableInput: boolean;
+  pendingDecision: TabCardType | null;
+  onPendingClose: (tab: TabCardType) => void;
+  onPendingKeep: (tab: TabCardType) => void;
+  onPendingSave: (tab: TabCardType) => void;
+  onPendingCancel: () => void;
 }
 
 export function SwipeScreen({
@@ -24,6 +33,14 @@ export function SwipeScreen({
   onSwipeRight,
   onSwipeUp,
   onUndo,
+  onPeek,
+  onOpen,
+  disableInput,
+  pendingDecision,
+  onPendingClose,
+  onPendingKeep,
+  onPendingSave,
+  onPendingCancel,
 }: SwipeScreenProps) {
   const openSaved = () => {
     browser.tabs.create({
@@ -46,6 +63,17 @@ export function SwipeScreen({
           Saved
         </button>
       </div>
+
+      {pendingDecision && (
+        <PendingDecisionPanel
+          tab={pendingDecision}
+          onClose={onPendingClose}
+          onKeep={onPendingKeep}
+          onSave={onPendingSave}
+          onCancel={onPendingCancel}
+        />
+      )}
+
       <SwipeDeck
         tabs={tabs}
         currentIndex={currentIndex}
@@ -56,6 +84,9 @@ export function SwipeScreen({
         onSwipeRight={onSwipeRight}
         onSwipeUp={onSwipeUp}
         onUndo={onUndo}
+        onPeek={onPeek}
+        onOpen={onOpen}
+        disableInput={disableInput}
       />
     </div>
   );

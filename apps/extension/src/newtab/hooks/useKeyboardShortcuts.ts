@@ -5,6 +5,8 @@ interface KeyboardActions {
   onSwipeRight: () => void;
   onSwipeUp: () => void;
   onUndo: () => void;
+  onPeek: () => void;
+  onOpen: () => void;
   enabled: boolean;
 }
 
@@ -13,6 +15,8 @@ export function useKeyboardShortcuts({
   onSwipeRight,
   onSwipeUp,
   onUndo,
+  onPeek,
+  onOpen,
   enabled,
 }: KeyboardActions) {
   useEffect(() => {
@@ -52,10 +56,18 @@ export function useKeyboardShortcuts({
             onUndo();
           }
           break;
+        case " ":
+          e.preventDefault();
+          onPeek();
+          break;
+        case "Enter":
+          e.preventDefault();
+          onOpen();
+          break;
       }
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [onSwipeLeft, onSwipeRight, onSwipeUp, onUndo, enabled]);
+  }, [onSwipeLeft, onSwipeRight, onSwipeUp, onUndo, onPeek, onOpen, enabled]);
 }

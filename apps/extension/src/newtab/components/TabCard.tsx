@@ -1,8 +1,11 @@
+import type { MouseEvent, PointerEvent } from "react";
 import type { TabCard as TabCardType } from "@decluttr/types";
 import { formatRelativeTime } from "../../lib/tabs";
 
 interface TabCardProps {
   tab: TabCardType;
+  onPeek?: (tab: TabCardType) => void;
+  onOpen?: (tab: TabCardType) => void;
 }
 
 // Generate a consistent pastel background color from a domain string
@@ -24,9 +27,16 @@ function domainAccent(domain: string): string {
   return `hsl(${hue}, 55%, 45%)`;
 }
 
-export function TabCard({ tab }: TabCardProps) {
+export function TabCard({ tab, onPeek, onOpen }: TabCardProps) {
   const bg = domainColor(tab.domain);
   const accent = domainAccent(tab.domain);
+
+  const stopAnd = (fn?: (tab: TabCardType) => void) =>
+    (e: MouseEvent | PointerEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      fn?.(tab);
+    };
 
   return (
     <div className="w-[380px] bg-surface rounded-card shadow-card overflow-hidden select-none">
@@ -122,6 +132,45 @@ export function TabCard({ tab }: TabCardProps) {
             </span>
           )}
         </div>
+
+        {(onPeek || onOpen) && (
+          <div
+            className="flex items-center gap-2 pt-2 border-t border-gray-100"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            {onPeek && (
+              <button
+                type="button"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={stopAnd(onPeek)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-primary/5 transition-colors text-xs font-medium"
+                title="Peek (Space)"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                Peek
+              </button>
+            )}
+            {onOpen && (
+              <button
+                type="button"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={stopAnd(onOpen)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-primary/5 transition-colors text-xs font-medium"
+                title="Open tab (Enter)"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+                Open
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

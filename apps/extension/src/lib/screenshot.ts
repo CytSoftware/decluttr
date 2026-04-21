@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 import type { TabCard } from "@decluttr/types";
 
-interface CaptureResult {
+export interface CaptureResult {
   success: boolean;
   dataUrl?: string;
   error?: string;
@@ -10,7 +10,7 @@ interface CaptureResult {
 /**
  * Requests a screenshot capture from the background script.
  */
-async function captureTab(
+export async function captureTab(
   tabId: number,
   windowId: number
 ): Promise<CaptureResult> {

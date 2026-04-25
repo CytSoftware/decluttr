@@ -1,25 +1,48 @@
 import { useEffect, useState } from "react";
 import browser from "webextension-polyfill";
 import { loadSavedTabs } from "../lib/saved";
+import { loadSettings, saveSettings } from "../lib/settings";
+import type { DecluttrSettings } from "@decluttr/types";
+import { DEFAULT_SETTINGS } from "@decluttr/types";
 
 export function App() {
   const [savedCount, setSavedCount] = useState<number | null>(null);
+  const [settings, setSettings] = useState<DecluttrSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
     loadSavedTabs().then((tabs) => setSavedCount(tabs.length));
+    loadSettings().then(setSettings);
   }, []);
 
-  const startDecluttering = async () => {
-    const decluttrUrl = browser.runtime.getURL("src/newtab/index.html");
-    const existingTabs = await browser.tabs.query({ url: decluttrUrl });
+  const toggleSidePanel = async (checked: boolean) => {
+    const updated = await saveSettings({ openInSidePanel: checked });
+    setSettings(updated);
+  };
 
-    if (existingTabs.length > 0 && existingTabs[0].id) {
-      await browser.tabs.update(existingTabs[0].id, { active: true });
-      if (existingTabs[0].windowId) {
-        await browser.windows.update(existingTabs[0].windowId, { focused: true });
+  const startDecluttering = async () => {
+    const useSidePanel =
+      settings.openInSidePanel &&
+      typeof chrome !== "undefined" &&
+      (chrome as any).sidePanel;
+
+    if (useSidePanel) {
+      const currentWindow = await browser.windows.getCurrent();
+      if (currentWindow.id) {
+        await (chrome as any).sidePanel.open({ windowId: currentWindow.id });
       }
     } else {
-      await browser.tabs.create({ url: decluttrUrl });
+      // Tab mode (default fallback / Firefox)
+      const decluttrUrl = browser.runtime.getURL("src/newtab/index.html");
+      const existingTabs = await browser.tabs.query({ url: decluttrUrl });
+
+      if (existingTabs.length > 0 && existingTabs[0].id) {
+        await browser.tabs.update(existingTabs[0].id, { active: true });
+        if (existingTabs[0].windowId) {
+          await browser.windows.update(existingTabs[0].windowId, { focused: true });
+        }
+      } else {
+        await browser.tabs.create({ url: decluttrUrl });
+      }
     }
     window.close();
   };
@@ -47,6 +70,16 @@ export function App() {
         </svg>
         Start Decluttering
       </button>
+
+      <label className="flex items-center gap-2 px-1 text-xs text-text-secondary cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={settings.openInSidePanel}
+          onChange={(e) => toggleSidePanel(e.target.checked)}
+          className="w-3.5 h-3.5 rounded accent-primary"
+        />
+        Open in side panel
+      </label>
 
       <button
         onClick={viewSaved}

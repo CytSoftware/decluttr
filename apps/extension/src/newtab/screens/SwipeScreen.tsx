@@ -12,6 +12,7 @@ interface SwipeScreenProps {
   onSwipeRight: (tab: TabCardType) => void;
   onSwipeUp: (tab: TabCardType) => void;
   onUndo: () => void;
+  onCardClick?: () => void;
 }
 
 export function SwipeScreen({
@@ -24,6 +25,7 @@ export function SwipeScreen({
   onSwipeRight,
   onSwipeUp,
   onUndo,
+  onCardClick,
 }: SwipeScreenProps) {
   const openSaved = () => {
     browser.tabs.create({
@@ -56,6 +58,7 @@ export function SwipeScreen({
         onSwipeRight={onSwipeRight}
         onSwipeUp={onSwipeUp}
         onUndo={onUndo}
+        onCardClick={onCardClick}
       />
     </div>
   );

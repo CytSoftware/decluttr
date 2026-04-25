@@ -16,6 +16,7 @@ interface SwipeDeckProps {
   onSwipeRight: (tab: TabCardType) => void;
   onSwipeUp: (tab: TabCardType) => void;
   onUndo: () => void;
+  onCardClick?: () => void;
 }
 
 const SWIPE_THRESHOLD = 80;
@@ -44,6 +45,8 @@ function getActiveDirection(dx: number, dy: number): SwipeDir {
   return null;
 }
 
+const CLICK_DRAG_THRESHOLD = 10;
+
 export function SwipeDeck({
   tabs,
   currentIndex,
@@ -54,10 +57,12 @@ export function SwipeDeck({
   onSwipeRight,
   onSwipeUp,
   onUndo,
+  onCardClick,
 }: SwipeDeckProps) {
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   const [exiting, setExiting] = useState<SwipeDir>(null);
   const startPos = useRef<{ x: number; y: number } | null>(null);
+  const hasDragged = useRef(false);
   const pendingAction = useRef<(() => void) | null>(null);
 
   const currentTab = currentIndex < tabs.length ? tabs[currentIndex] : null;
@@ -96,6 +101,7 @@ export function SwipeDeck({
       if (exiting) return;
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       startPos.current = { x: e.clientX, y: e.clientY };
+      hasDragged.current = false;
       setDrag({ x: 0, y: 0 });
     },
     [exiting]
@@ -104,10 +110,12 @@ export function SwipeDeck({
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
       if (!startPos.current) return;
-      setDrag({
-        x: e.clientX - startPos.current.x,
-        y: e.clientY - startPos.current.y,
-      });
+      const dx = e.clientX - startPos.current.x;
+      const dy = e.clientY - startPos.current.y;
+      if (Math.abs(dx) > CLICK_DRAG_THRESHOLD || Math.abs(dy) > CLICK_DRAG_THRESHOLD) {
+        hasDragged.current = true;
+      }
+      setDrag({ x: dx, y: dy });
     },
     []
   );
@@ -122,10 +130,13 @@ export function SwipeDeck({
     startPos.current = null;
     if (dir) {
       triggerSwipe(dir, currentTab);
+    } else if (!hasDragged.current && onCardClick) {
+      onCardClick();
+      setDrag(null);
     } else {
       setDrag(null);
     }
-  }, [drag, currentTab, triggerSwipe]);
+  }, [drag, currentTab, triggerSwipe, onCardClick]);
 
   // Programmatic swipe (buttons + keyboard)
   const swipeLeft = useCallback(() => {
@@ -187,7 +198,7 @@ export function SwipeDeck({
       {excludedCount > 0 && <ExcludedNotice count={excludedCount} />}
 
       {/* Card stack */}
-      <div className="relative w-[380px] h-[360px] overflow-visible">
+      <div className="relative w-full max-w-[380px] h-[360px] overflow-visible">
         {visibleTabs.map((tab, i) => {
           const reverseIndex = visibleTabs.length - 1 - i;
           const isTop = reverseIndex === 0;
@@ -237,6 +248,10 @@ export function SwipeDeck({
           );
         })}
       </div>
+
+      <p className="text-[11px] text-text-muted -mt-3">
+        Click card to focus tab
+      </p>
 
       <SwipeButtons
         onClose={swipeLeft}

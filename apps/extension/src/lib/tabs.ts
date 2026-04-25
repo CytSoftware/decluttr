@@ -45,11 +45,11 @@ function normalizeUrl(url: string): string {
  */
 function isSpecialTab(
   tab: browser.Tabs.Tab,
-  selfTabId: number | undefined,
+  excludedTabIds: Set<number>,
   excludedDomains: string[]
 ): boolean {
   if (tab.pinned) return true;
-  if (tab.id === selfTabId) return true;
+  if (tab.id !== undefined && excludedTabIds.has(tab.id)) return true;
   if (!tab.url) return true;
 
   if (EXCLUDED_PROTOCOLS.some((p) => tab.url!.startsWith(p))) return true;
@@ -74,9 +74,14 @@ export async function fetchAndProcessTabs(
   // Get all tabs across all windows
   const allTabs = await browser.tabs.query({});
 
-  // Get the current Decluttr tab ID to exclude it
-  const currentTab = await browser.tabs.getCurrent();
-  const selfTabId = currentTab?.id;
+  // Exclude Decluttr UI tabs (newtab, saved, options, sidepanel, popup)
+  const extensionOrigin = browser.runtime.getURL("");
+  const excludedTabIds = new Set<number>();
+  for (const tab of allTabs) {
+    if (tab.id && tab.url?.startsWith(extensionOrigin)) {
+      excludedTabIds.add(tab.id);
+    }
+  }
 
   // Get LRU access times (for Chrome which lacks lastAccessed)
   const accessTimes = await getAccessTimes();
@@ -91,7 +96,7 @@ export async function fetchAndProcessTabs(
   const eligibleTabs: TabCard[] = [];
 
   for (const tab of allTabs) {
-    if (isSpecialTab(tab, selfTabId, settings.excludedDomains)) {
+    if (isSpecialTab(tab, excludedTabIds, settings.excludedDomains)) {
       excludedCount++;
       continue;
     }

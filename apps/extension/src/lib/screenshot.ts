@@ -37,7 +37,10 @@ export async function batchCaptureScreenshots(
 
   // Get current window to only capture same-window tabs
   const currentTab = await browser.tabs.getCurrent();
-  const currentWindowId = currentTab?.windowId;
+  const currentWindow = currentTab?.windowId
+    ? undefined
+    : await browser.windows.getCurrent();
+  const currentWindowId = currentTab?.windowId ?? currentWindow?.id;
 
   // Filter to same-window tabs only
   const captureable = tabs.filter((t) => t.windowId === currentWindowId);

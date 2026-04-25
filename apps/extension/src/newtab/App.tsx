@@ -10,6 +10,15 @@ import { SwipeScreen } from "./screens/SwipeScreen";
 import { SummaryScreen } from "./screens/SummaryScreen";
 import { EmptyScreen } from "./screens/EmptyScreen";
 
+async function closeDecluttrView() {
+  const currentTab = await browser.tabs.getCurrent();
+  if (currentTab?.id) {
+    await browser.tabs.remove(currentTab.id);
+  } else {
+    window.close();
+  }
+}
+
 export function App() {
   const {
     state,
@@ -25,7 +34,15 @@ export function App() {
   } = useSwipeDeck();
 
   const [undoingTabId, setUndoingTabId] = useState<number | null>(null);
+  const [isSidePanel, setIsSidePanel] = useState<boolean>(false);
   const closingTabIds = useRef<Set<number>>(new Set());
+
+  // Detect whether we're running in a side panel (no current tab)
+  useEffect(() => {
+    browser.tabs.getCurrent().then((tab) => {
+      setIsSidePanel(!tab);
+    });
+  }, []);
 
   // Initialize: fetch tabs, start session
   useEffect(() => {
@@ -46,6 +63,18 @@ export function App() {
       cancelled = true;
     };
   }, [initDeck]);
+
+  // Activate the tab currently shown in the deck so the user sees it in the main window
+  // (only when running inside the side panel)
+  useEffect(() => {
+    if (!isSidePanel || state.deckState !== "swiping") return;
+    const tab = state.tabs[state.currentIndex];
+    if (!tab?.id) return;
+
+    browser.tabs.update(tab.id, { active: true }).catch(() => {
+      /* tab may have been closed */
+    });
+  }, [isSidePanel, state.currentIndex, state.deckState, state.tabs]);
 
   // Listen for externally closed tabs (skip tabs we closed ourselves)
   useEffect(() => {
@@ -114,26 +143,21 @@ export function App() {
     undo();
   }, [undo, state.undoStack]);
 
-  // Summary confirm: close the Decluttr tab
+  // Summary confirm: close the Decluttr view
   const handleConfirm = useCallback(async () => {
-    setTimeout(async () => {
-      const currentTab = await browser.tabs.getCurrent();
-      if (currentTab?.id) await browser.tabs.remove(currentTab.id);
-    }, 1000);
+    setTimeout(closeDecluttrView, 1000);
   }, []);
 
   const handleCancel = useCallback(async () => {
-    const currentTab = await browser.tabs.getCurrent();
-    if (currentTab?.id) await browser.tabs.remove(currentTab.id);
+    await closeDecluttrView();
   }, []);
 
   const handleClose = useCallback(async () => {
-    const currentTab = await browser.tabs.getCurrent();
-    if (currentTab?.id) await browser.tabs.remove(currentTab.id);
+    await closeDecluttrView();
   }, []);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center px-3 py-6">
       {state.deckState === "loading" && <LoadingScreen />}
 
       {state.deckState === "swiping" && (
@@ -147,6 +171,16 @@ export function App() {
           onSwipeRight={keepTab}
           onSwipeUp={handleSaveTab}
           onUndo={handleUndo}
+          onCardClick={
+            isSidePanel
+              ? () => {
+                  const tab = state.tabs[state.currentIndex];
+                  if (tab?.id) {
+                    browser.tabs.update(tab.id, { active: true }).catch(() => {});
+                  }
+                }
+              : undefined
+          }
         />
       )}
 

@@ -29,7 +29,7 @@ browser.tabs.onRemoved.addListener(async (tabId) => {
   }
 });
 
-// Handle messages from the UI (screenshot capture, etc.)
+// Handle messages from the UI (screenshot capture, tab activation, etc.)
 browser.runtime.onMessage.addListener(
   (message: { type: string; tabId?: number; windowId?: number }, sender) => {
     if (message.type === "CAPTURE_TAB" && message.tabId && message.windowId) {
@@ -37,6 +37,9 @@ browser.runtime.onMessage.addListener(
     }
     if (message.type === "GET_ACCESS_TIMES") {
       return handleGetAccessTimes();
+    }
+    if (message.type === "ACTIVATE_TAB" && message.tabId) {
+      return handleActivateTab(message.tabId);
     }
     return undefined;
   }

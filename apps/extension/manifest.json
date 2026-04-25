@@ -7,7 +7,8 @@
   "{{chrome}}.permissions": [
     "tabs",
     "activeTab",
-    "storage"
+    "storage",
+    "sidePanel"
   ],
   "{{chrome}}.host_permissions": [
     "<all_urls>"
@@ -26,6 +27,9 @@
     },
     "default_title": "Decluttr — Swipe to declutter",
     "default_popup": "src/popup/index.html"
+  },
+  "{{chrome}}.side_panel": {
+    "default_path": "src/newtab/index.html"
   },
   "{{firefox}}.browser_action": {
     "default_icon": {

@@ -1,4 +1,6 @@
 import browser from "webextension-polyfill";
+import type { DecisionRecord } from "@decluttr/types";
+import { getBridgeStatus, reconnectNow, recordDecision, startBridge, stopBridge } from "./bridge";
 
 const TAB_ACCESS_KEY = "decluttr_tab_access_times";
 
@@ -9,7 +11,7 @@ const TAB_ACCESS_KEY = "decluttr_tab_access_times";
 browser.tabs.onActivated.addListener(async ({ tabId }) => {
   try {
     const data = await browser.storage.local.get(TAB_ACCESS_KEY);
-    const times: Record<number, number> = data[TAB_ACCESS_KEY] ?? {};
+    const times = (data[TAB_ACCESS_KEY] as Record<number, number> | undefined) ?? {};
     times[tabId] = Date.now();
     await browser.storage.local.set({ [TAB_ACCESS_KEY]: times });
   } catch {
@@ -21,7 +23,7 @@ browser.tabs.onActivated.addListener(async ({ tabId }) => {
 browser.tabs.onRemoved.addListener(async (tabId) => {
   try {
     const data = await browser.storage.local.get(TAB_ACCESS_KEY);
-    const times: Record<number, number> = data[TAB_ACCESS_KEY] ?? {};
+    const times = (data[TAB_ACCESS_KEY] as Record<number, number> | undefined) ?? {};
     delete times[tabId];
     await browser.storage.local.set({ [TAB_ACCESS_KEY]: times });
   } catch {
@@ -30,17 +32,28 @@ browser.tabs.onRemoved.addListener(async (tabId) => {
 });
 
 // Handle messages from the UI (screenshot capture, etc.)
-browser.runtime.onMessage.addListener(
-  (message: { type: string; tabId?: number; windowId?: number }, sender) => {
-    if (message.type === "CAPTURE_TAB" && message.tabId && message.windowId) {
-      return handleCaptureTab(message.tabId, message.windowId, sender.tab?.id);
-    }
-    if (message.type === "GET_ACCESS_TIMES") {
-      return handleGetAccessTimes();
-    }
-    return undefined;
+browser.runtime.onMessage.addListener((raw: unknown, sender: browser.Runtime.MessageSender) => {
+  const message = raw as {
+    type: string;
+    tabId?: number;
+    windowId?: number;
+    record?: DecisionRecord;
+  };
+  if (message.type === "DECISION" && message.record) {
+    return recordDecision(message.record);
   }
-);
+  if (message.type === "BRIDGE_STATUS") {
+    reconnectNow();
+    return getBridgeStatus();
+  }
+  if (message.type === "CAPTURE_TAB" && message.tabId && message.windowId) {
+    return handleCaptureTab(message.tabId, message.windowId, sender.tab?.id);
+  }
+  if (message.type === "GET_ACCESS_TIMES") {
+    return handleGetAccessTimes();
+  }
+  return undefined;
+});
 
 async function handleCaptureTab(
   tabId: number,
@@ -81,7 +94,16 @@ async function handleCaptureTab(
 
 async function handleGetAccessTimes(): Promise<Record<number, number>> {
   const data = await browser.storage.local.get(TAB_ACCESS_KEY);
-  return data[TAB_ACCESS_KEY] ?? {};
+  return (data[TAB_ACCESS_KEY] as Record<number, number> | undefined) ?? {};
 }
+
+// CLI bridge (opt-in via the optional nativeMessaging permission)
+void startBridge();
+browser.permissions.onAdded.addListener((p) => {
+  if (p.permissions?.includes("nativeMessaging")) void startBridge();
+});
+browser.permissions.onRemoved.addListener((p) => {
+  if (p.permissions?.includes("nativeMessaging")) stopBridge();
+});
 
 console.log("Decluttr background script loaded");

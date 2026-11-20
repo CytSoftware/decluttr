@@ -19,3 +19,5 @@ export const NEW_TAB_URLS = [
 
 export const TAB_ACCESS_KEY = "decluttr_tab_access_times";
 export const SAVED_TABS_KEY = "decluttr_saved_tabs";
+export const DECISION_LOG_KEY = "decluttr_decision_log";
+export const DECISION_LOG_MAX = 5000;

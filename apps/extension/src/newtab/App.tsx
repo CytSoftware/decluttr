@@ -5,10 +5,18 @@ import { useSwipeDeck } from "./hooks/useSwipeDeck";
 import { fetchAndProcessTabs } from "../lib/tabs";
 import { loadSettings } from "../lib/settings";
 import { addSavedTab, removeSavedTab } from "../lib/saved";
+import { toDecision } from "../lib/decisions";
+import type { DecisionAction } from "@decluttr/types";
 import { LoadingScreen } from "./screens/LoadingScreen";
 import { SwipeScreen } from "./screens/SwipeScreen";
 import { SummaryScreen } from "./screens/SummaryScreen";
 import { EmptyScreen } from "./screens/EmptyScreen";
+
+function logDecision(tab: TabCard, action: DecisionAction) {
+  browser.runtime
+    .sendMessage({ type: "DECISION", record: toDecision(tab, action, "ui") })
+    .catch(() => {});
+}
 
 export function App() {
   const {
@@ -70,6 +78,7 @@ export function App() {
       } catch { /* already closed */ }
 
       closeTab(tab);
+      logDecision(tab, "close");
     },
     [closeTab]
   );
@@ -88,6 +97,7 @@ export function App() {
 
       // Update state
       saveTab(tab);
+      logDecision(tab, "save");
     },
     [saveTab]
   );
@@ -112,7 +122,16 @@ export function App() {
     }
 
     undo();
+    logDecision(lastAction.tab, "undo");
   }, [undo, state.undoStack]);
+
+  const handleKeepTab = useCallback(
+    (tab: TabCard) => {
+      keepTab(tab);
+      logDecision(tab, "keep");
+    },
+    [keepTab]
+  );
 
   // Summary confirm: close the Decluttr tab
   const handleConfirm = useCallback(async () => {
@@ -144,7 +163,7 @@ export function App() {
           canUndo={canUndo}
           progress={progress}
           onSwipeLeft={handleCloseTab}
-          onSwipeRight={keepTab}
+          onSwipeRight={handleKeepTab}
           onSwipeUp={handleSaveTab}
           onUndo={handleUndo}
         />

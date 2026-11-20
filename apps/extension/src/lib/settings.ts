@@ -7,7 +7,7 @@ const SETTINGS_KEY = "decluttr_settings";
 export async function loadSettings(): Promise<DecluttrSettings> {
   try {
     const data = await browser.storage.local.get(SETTINGS_KEY);
-    const stored = data[SETTINGS_KEY];
+    const stored = data[SETTINGS_KEY] as Partial<DecluttrSettings> | undefined;
     return { ...DEFAULT_SETTINGS, ...stored };
   } catch {
     return { ...DEFAULT_SETTINGS };

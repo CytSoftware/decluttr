@@ -2,14 +2,54 @@ import { useEffect, useState, useCallback } from "react";
 import type { DecluttrSettings, SortOrder } from "@decluttr/types";
 import { DEFAULT_SETTINGS } from "@decluttr/types";
 import { loadSettings, saveSettings } from "../lib/settings";
+import browser from "webextension-polyfill";
 
 export function App() {
   const [settings, setSettings] = useState<DecluttrSettings>(DEFAULT_SETTINGS);
   const [saved, setSaved] = useState(false);
   const [domainInput, setDomainInput] = useState("");
 
+  const [bridgeOn, setBridgeOn] = useState(false);
+  const [bridge, setBridge] = useState<{ connected: boolean; error: string | null } | null>(null);
+
   useEffect(() => {
     loadSettings().then(setSettings);
+    browser.permissions
+      .contains({ permissions: ["nativeMessaging"] })
+      .then(setBridgeOn)
+      .catch(() => setBridgeOn(false));
+  }, []);
+
+  // While the CLI is enabled, poll the background for the host connection.
+  useEffect(() => {
+    if (!bridgeOn) {
+      setBridge(null);
+      return;
+    }
+    let alive = true;
+    const poll = () =>
+      browser.runtime
+        .sendMessage({ type: "BRIDGE_STATUS" })
+        .then((s) => alive && setBridge(s as { connected: boolean; error: string | null }))
+        .catch(() => {});
+    poll();
+    const t = setInterval(poll, 2000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+    };
+  }, [bridgeOn]);
+
+  // permissions.request must run directly from the click handler.
+  const toggleBridge = useCallback(async (on: boolean) => {
+    try {
+      const ok = on
+        ? await browser.permissions.request({ permissions: ["nativeMessaging"] })
+        : !(await browser.permissions.remove({ permissions: ["nativeMessaging"] }));
+      setBridgeOn(ok);
+    } catch {
+      setBridgeOn(false);
+    }
   }, []);
 
   const handleSave = useCallback(
@@ -175,6 +215,62 @@ export function App() {
                   </button>
                 </span>
               ))}
+            </div>
+          )}
+        </section>
+
+        {/* Command line bridge */}
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide">
+            Command Line
+          </h2>
+          <label className="flex items-center justify-between cursor-pointer">
+            <div>
+              <div className="text-sm text-text-primary">
+                Enable the decluttr CLI
+              </div>
+              <div className="text-xs text-text-muted">
+                Lets the local <code>decluttr</code> command (and agents you
+                run) list, close, keep and save tabs, and keeps a local
+                history of your swipes.
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              checked={bridgeOn}
+              onChange={(e) => toggleBridge(e.target.checked)}
+              className="w-5 h-5 rounded accent-primary"
+            />
+          </label>
+          {bridgeOn && bridge && (
+            <div className="flex items-start gap-2 text-xs">
+              <span
+                className={`mt-1 inline-block w-2 h-2 rounded-full ${
+                  bridge.connected ? "bg-keep" : "bg-gray-300"
+                }`}
+              />
+              {bridge.connected ? (
+                <span className="text-text-secondary">
+                  Connected. Try <code>decluttr tabs</code> in a terminal.
+                </span>
+              ) : (
+                <span className="text-text-secondary">
+                  Waiting for the bridge. Install it once with{" "}
+                  <code>./bridge/install.sh</code> (
+                  <a
+                    href="https://github.com/CytSoftware/decluttr/tree/main/bridge"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
+                    setup guide
+                  </a>
+                  ), then this connects on its own.
+                  {bridge.error && (
+                    <span className="block text-text-muted mt-0.5">{bridge.error}</span>
+                  )}
+                </span>
+              )}
             </div>
           )}
         </section>

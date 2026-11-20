@@ -5,7 +5,7 @@ import { SAVED_TABS_KEY } from "./constants";
 export async function loadSavedTabs(): Promise<SavedTab[]> {
   try {
     const data = await browser.storage.local.get(SAVED_TABS_KEY);
-    return data[SAVED_TABS_KEY] ?? [];
+    return (data[SAVED_TABS_KEY] as SavedTab[] | undefined) ?? [];
   } catch {
     return [];
   }

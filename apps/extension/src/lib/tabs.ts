@@ -139,7 +139,7 @@ async function getAccessTimes(): Promise<Record<number, number>> {
     const response = await browser.runtime.sendMessage({
       type: "GET_ACCESS_TIMES",
     });
-    return response ?? {};
+    return (response as Record<number, number> | undefined) ?? {};
   } catch {
     return {};
   }

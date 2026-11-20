@@ -1,0 +1,244 @@
+#!/usr/bin/env python3
+"""decluttr: control Decluttr (and your browser tabs) from the command line.
+
+  decluttr status                     is the browser connected?
+  decluttr tabs [--json] [--older-than 2d] [--domain x] [--dupes]
+  decluttr close ID... | -            close tabs (ids, or "-" to read ids from stdin)
+  decluttr save  ID... | -            save for later, then close
+  decluttr keep  ID... | -            mark as kept (logged, tab stays open)
+  decluttr focus ID                   switch to a tab
+  decluttr saved [--json]             list saved-for-later tabs
+  decluttr log   [--since 7d] [--json]   decision history (swipes + CLI)
+  decluttr stats [--since 30d]        keep/close/save counts per domain
+
+Works by dropping request files into $DECLUTTR_HOME/inbox (default
+~/.decluttr), so it also runs from a VM or sandbox that mounts that folder.
+Pinned and excluded tabs are never listed or closed.
+"""
+import argparse
+import json
+import os
+import sys
+import time
+import uuid
+from collections import defaultdict
+from pathlib import Path
+
+HOME = Path(os.environ.get("DECLUTTR_HOME", Path.home() / ".decluttr"))
+TIMEOUT_S = float(os.environ.get("DECLUTTR_TIMEOUT", "15"))
+
+
+def die(msg: str, code: int = 1):
+    print(f"decluttr: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+
+def parse_age(s: str) -> float:
+    """'90m', '6h', '2d', '1w' -> seconds."""
+    units = {"s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604800}
+    try:
+        return float(s[:-1]) * units[s[-1]] if s[-1] in units else float(s)
+    except (ValueError, IndexError):
+        die(f"bad duration: {s} (use e.g. 90m, 6h, 2d)")
+
+
+def status() -> dict:
+    try:
+        return json.loads((HOME / "status.json").read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def alive(st: dict) -> bool:
+    return bool(st.get("connected")) and time.time() - st.get("heartbeat", 0) < 20
+
+
+def call(cmd: str, **args):
+    if not alive(status()):
+        die(
+            "bridge not connected. Open the browser, and in Decluttr Settings turn on "
+            "'Enable the decluttr CLI' (run bridge/install.sh once first)."
+        )
+    rid = uuid.uuid4().hex
+    inbox, outbox = HOME / "inbox", HOME / "outbox"
+    tmp = inbox / f".{rid}.tmp"
+    tmp.write_text(json.dumps({"id": rid, "cmd": cmd, "args": args}))
+    os.replace(tmp, inbox / f"{rid}.json")
+    out = outbox / f"{rid}.json"
+    deadline = time.time() + TIMEOUT_S
+    while time.time() < deadline:
+        if out.exists():
+            try:
+                res = json.loads(out.read_text())
+            except ValueError:
+                time.sleep(0.05)
+                continue
+            try:
+                out.unlink()
+            except OSError:
+                pass
+            if not res.get("ok"):
+                die(res.get("error", "request failed"))
+            return res.get("result")
+        time.sleep(0.1)
+    try:
+        (inbox / f"{rid}.json").unlink()
+    except OSError:
+        pass
+    die("timed out waiting for the browser")
+
+
+def fmt_age(ms_ts: float) -> str:
+    if not ms_ts:
+        return "?"
+    s = max(0, time.time() - ms_ts / 1000)
+    for unit, n in (("w", 604800), ("d", 86400), ("h", 3600), ("m", 60)):
+        if s >= n:
+            return f"{int(s // n)}{unit}"
+    return "now"
+
+
+def ids_from(args) -> list:
+    raw = args.ids
+    if raw == ["-"]:
+        raw = sys.stdin.read().split()
+    try:
+        return [int(x) for x in raw]
+    except ValueError:
+        die("tab ids must be numbers")
+
+
+def cmd_tabs(a):
+    tabs = call("tabs")
+    now = time.time() * 1000
+    if a.older_than:
+        cutoff = parse_age(a.older_than) * 1000
+        tabs = [t for t in tabs if t.get("lastAccessed") and now - t["lastAccessed"] >= cutoff]
+    if a.domain:
+        tabs = [t for t in tabs if a.domain in t.get("domain", "")]
+    if a.dupes:
+        tabs = [t for t in tabs if t.get("duplicateCount")]
+    if a.json:
+        print(json.dumps(tabs, indent=1, ensure_ascii=False))
+        return
+    for t in tabs:
+        dup = f"x{t['duplicateCount']}" if t.get("duplicateCount") else ""
+        print(f"{t['id']:>6}  {fmt_age(t.get('lastAccessed')):>4}  w{t.get('window', '?')}  {dup:>4}  "
+              f"{t.get('domain', '')[:28]:<28}  {t.get('title', '')[:70]}")
+    print(f"{len(tabs)} tabs", file=sys.stderr)
+
+
+def cmd_action(a):
+    ids = ids_from(a)
+    if not ids:
+        die("no tab ids given")
+    print(json.dumps(call(a.cmd, ids=ids)))
+
+
+def cmd_focus(a):
+    print(json.dumps(call("focus", ids=[int(a.id)])))
+
+
+def cmd_saved(a):
+    saved = call("saved")
+    if a.json:
+        print(json.dumps(saved, indent=1, ensure_ascii=False))
+        return
+    for t in saved:
+        print(f"{fmt_age(t.get('savedAt')):>4}  {t.get('domain', '')[:28]:<28}  {t.get('title', '')[:70]}")
+
+
+def load_log(since_s: float) -> list:
+    """Prefer the host's append-only file; fall back to the extension's copy."""
+    cutoff = (time.time() - since_s) * 1000 if since_s else 0
+    path = HOME / "decisions.jsonl"
+    rows = []
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if r and r.get("ts", 0) >= cutoff:
+                rows.append(r)
+        return rows
+    return call("log", since=cutoff, limit=5000)
+
+
+def cmd_log(a):
+    rows = load_log(parse_age(a.since) if a.since else 0)
+    if a.json:
+        print(json.dumps(rows, indent=1, ensure_ascii=False))
+        return
+    for r in rows:
+        when = time.strftime("%m-%d %H:%M", time.localtime(r["ts"] / 1000))
+        age = fmt_age(r["ts"] - r.get("ageMs", 0)) if r.get("ageMs") else "?"
+        dup = f"x{r['duplicateCount']}" if r.get("isDuplicate") else ""
+        print(f"{when}  {r['action']:<5} {r.get('source', ''):<3}  {age:>4}  {dup:>4}  "
+              f"{r.get('domain', '')[:28]:<28}  {r.get('title', '')[:60]}")
+
+
+def cmd_stats(a):
+    rows = load_log(parse_age(a.since))
+    # Undo cancels the decision right before it for the same URL.
+    order = []
+    for r in rows:
+        if r["action"] == "undo":
+            for i in range(len(order) - 1, -1, -1):
+                if order[i].get("url") == r.get("url"):
+                    order.pop(i)
+                    break
+            continue
+        order.append(r)
+    counts = defaultdict(lambda: defaultdict(int))
+    for r in order:
+        counts[r.get("domain", "?")][r["action"]] += 1
+    rows_out = sorted(counts.items(), key=lambda kv: -sum(kv[1].values()))
+    print(f"{'domain':<34} {'close':>5} {'keep':>5} {'save':>5}  close%")
+    for dom, c in rows_out:
+        total = sum(c.values())
+        print(f"{dom[:34]:<34} {c['close']:>5} {c['keep']:>5} {c['save']:>5}  {100 * c['close'] // total:>5}%")
+
+
+def main():
+    p = argparse.ArgumentParser(prog="decluttr", description=__doc__.split("\n")[0])
+    sub = p.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("status")
+    t = sub.add_parser("tabs")
+    t.add_argument("--json", action="store_true")
+    t.add_argument("--older-than")
+    t.add_argument("--domain")
+    t.add_argument("--dupes", action="store_true")
+    for name in ("close", "save", "keep"):
+        s = sub.add_parser(name)
+        s.add_argument("ids", nargs="+")
+    f = sub.add_parser("focus")
+    f.add_argument("id")
+    s = sub.add_parser("saved")
+    s.add_argument("--json", action="store_true")
+    lg = sub.add_parser("log")
+    lg.add_argument("--since")
+    lg.add_argument("--json", action="store_true")
+    st = sub.add_parser("stats")
+    st.add_argument("--since", default="30d")
+    a = p.parse_args()
+
+    if a.cmd == "status":
+        st = status()
+        ok = alive(st)
+        print(json.dumps({**st, "connected": ok}))
+        sys.exit(0 if ok else 2)
+    {
+        "tabs": cmd_tabs,
+        "close": cmd_action,
+        "save": cmd_action,
+        "keep": cmd_action,
+        "focus": cmd_focus,
+        "saved": cmd_saved,
+        "log": cmd_log,
+        "stats": cmd_stats,
+    }[a.cmd](a)
+
+
+if __name__ == "__main__":
+    main()

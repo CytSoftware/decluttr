@@ -43,6 +43,7 @@ Built for knowledge workers who chronically accumulate 30-100+ tabs across proje
 - **Rescue list** — Review all tabs marked for closing before confirming, rescue any with one click
 - **Settings** — Sort order, excluded domains, and more
 - **Cross-browser** — Chrome (MV3) and Firefox (MV2) from a single codebase
+- **Command line (opt-in)** — `decluttr tabs`, `decluttr close`, decision history for scripts and AI agents. See [bridge/README.md](bridge/README.md)
 
 ## Install
 
@@ -110,6 +111,7 @@ decluttr/
 │   │   │   └── styles/     # Global CSS + Tailwind
 │   │   └── manifest.json   # Cross-browser manifest template
 │   └── landing/            # Marketing website (React + Vite)
+├── bridge/                 # Opt-in CLI + native messaging host
 ├── packages/
 │   ├── config/             # Shared Tailwind config + color palette
 │   ├── types/              # Shared TypeScript types
